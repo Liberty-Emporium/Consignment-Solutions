@@ -1,0 +1,29 @@
+{% extends 'base.html' %}{% block title %}Settings{% endblock %}{% block content %}
+<div class="ph"><h1>⚙️ Settings</h1></div>
+<div style="max-width:600px;">
+<div class="card"><h3>🏪 Store Info</h3><form method="POST"><input type="hidden" name="form_type" value="store">
+<div class="fg"><label>Store Name</label><input name="store_name" value="{{ store.name }}"></div>
+<div class="fg"><label>Phone</label><input name="phone" value="{{ store.phone or '' }}"></div>
+<button type="submit" class="btn btn-g">Save Store Info</button></form></div>
+
+<div class="card"><h3>🤖 AI Settings</h3><form method="POST"><input type="hidden" name="form_type" value="ai">
+<div class="fg"><label>Active Provider</label><select name="ai_provider">
+<option value="qwen" {% if store.ai_provider=='qwen' %}selected{% endif %}>Qwen (Affordable)</option>
+<option value="groq" {% if store.ai_provider=='groq' %}selected{% endif %}>Groq (Free tier)</option>
+</select></div>
+<div class="fg"><label>Qwen API Key</label><input type="password" name="qwen_key" placeholder="{% if store.qwen_key %}{{ store.qwen_key }}{% else %}Enter Qwen key{% endif %}"><small style="color:#64748b;">dashscope.aliyuncs.com</small></div>
+<div class="fg"><label>Groq API Key</label><input type="password" name="groq_key" placeholder="{% if store.groq_key %}{{ store.groq_key }}{% else %}Enter Groq key{% endif %}"><small style="color:#64748b;">console.groq.com (free)</small></div>
+<button type="submit" class="btn btn-p">Save AI Settings</button></form></div>
+
+<div class="card"><h3>🟦 Square Integration</h3><form method="POST"><input type="hidden" name="form_type" value="square">
+<div class="fg"><label>Environment</label><select name="square_env">
+<option value="sandbox" {% if store.square_env=='sandbox' %}selected{% endif %}>Sandbox (Testing)</option>
+<option value="production" {% if store.square_env=='production' %}selected{% endif %}>Production (Live)</option>
+</select></div>
+<div class="fg"><label>Access Token</label><input type="password" name="square_token" placeholder="{% if store.square_token %}{{ store.square_token }}{% else %}EAAAl...{% endif %}"></div>
+<div class="fg"><label>Location ID</label><input name="square_location" value="{{ store.square_location or '' }}"></div>
+<div class="fg"><label>Webhook Signature Key (optional)</label><input type="password" name="square_webhook_sig" placeholder="For verifying Square webhooks"></div>
+<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:0.75rem;margin-bottom:1rem;font-size:0.8rem;color:#92400e;">
+<strong>Your Webhook URL:</strong> Set this in Square Developer Dashboard:<br><code>{{ webhook_url }}</code></div>
+<button type="submit" class="btn btn-p">Save Square Settings</button></form></div>
+</div>{% endblock %}

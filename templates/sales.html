@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% block title %}Sales{% endblock %}{% block content %}
+<div class="ph"><div><h1>💲 Sales</h1><p>Total: <strong>${{ '%.2f'|format(total) }}</strong></p></div>
+<div style="display:flex;gap:0.5rem;align-items:center;">
+<form method="GET" style="display:flex;gap:0.5rem;"><input type="month" name="month" value="{{ month }}" style="width:auto;"><button class="btn btn-g btn-sm">Filter</button></form>
+<a href="/sales/add" class="btn btn-p">+ Record Sale</a></div></div>
+<div class="card">{% if sales %}
+<table><thead><tr><th>Item</th><th>Vendor</th><th>Qty</th><th>Total</th><th>Date</th><th>Via</th></tr></thead><tbody>
+{% for s in sales %}<tr>
+<td><strong>{{ s.item_name }}</strong></td><td>{{ s.vendor_name }}</td><td>{{ s.quantity }}</td>
+<td><strong>${{ '%.2f'|format(s.total_amount) }}</strong></td><td>{{ s.sale_date }}</td>
+<td><span class="badge {% if s.source=='square' %}bb{% else %}bk{% endif %}">{{ s.source }}</span></td>
+</tr>{% endfor %}</tbody></table>
+{% else %}<div class="empty"><div class="ei">💲</div><p>No sales for {{ month }}</p></div>{% endif %}</div>{% endblock %}

@@ -1,0 +1,8 @@
+{% extends 'base.html' %}{% block title %}My Items{% endblock %}{% block content %}
+<div class="ph"><div><h1>📦 My Items</h1></div><a href="/vendor/items/add" class="btn btn-p">+ Add Item</a></div>
+<div class="card">{% if items %}
+<table><thead><tr><th>Item</th><th>Shelf</th><th>Price</th><th>Qty</th><th>Sold</th></tr></thead><tbody>
+{% for i in items %}<tr><td><strong>{{ i.name }}</strong></td><td>{{ i.shelf_number or '—' }}</td>
+<td>${{ '%.2f'|format(i.price) }}</td><td>{{ i.quantity }}</td><td>{{ i.quantity_sold }}</td></tr>{% endfor %}
+</tbody></table>
+{% else %}<div class="empty"><div class="ei">📦</div><p>No items yet. <a href="/vendor/items/add">Add your first item.</a></p></div>{% endif %}</div>{% endblock %}

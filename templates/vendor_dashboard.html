@@ -1,0 +1,41 @@
+{% extends 'base.html' %}{% block title %}My Dashboard{% endblock %}{% block content %}
+<div class="ph"><div><h1>👋 {{ session.vendor_name }}</h1><p>{{ session.store_name }} · {{ month }}</p></div></div>
+<div class="sg">
+  <div class="stat" style="border-color:#10b981"><div class="sv">${{ '%.2f'|format(settlement.total_sales) }}</div><div class="sl">💲 My Sales</div></div>
+  <div class="stat" style="border-color:#ef4444"><div class="sv">${{ '%.2f'|format(settlement.total_rent) }}</div><div class="sl">🏷️ Rent</div></div>
+  <div class="stat" style="border-color:{% if settlement.balance >= 0 %}#10b981{% else %}#ef4444{% endif %}">
+    <div class="sv {% if settlement.balance >= 0 %}pos{% else %}neg{% endif %}">${{ '%.2f'|format(settlement.balance|abs) }}</div>
+    <div class="sl">{% if settlement.balance >= 0 %}Store Owes You{% else %}You Owe Store{% endif %}</div>
+  </div>
+  <div class="stat" style="border-color:#6c63ff"><div class="sv">{{ my_items }}</div><div class="sl">📦 Items on Floor</div></div>
+</div>
+<div class="g2">
+<div>
+  <div class="card"><h3>🗄️ My Shelves</h3>
+  {% for s in shelves %}
+  <div style="display:flex;justify-content:space-between;padding:0.7rem;background:#f8fafc;border-radius:8px;margin-bottom:0.4rem;">
+    <div><strong>Shelf {{ s.shelf_number }}</strong><br><small>Since {{ s.start_date }}</small></div>
+    <div style="text-align:right;"><strong>${{ '%.2f'|format(s.monthly_rent) }}/mo</strong></div>
+  </div>{% else %}<div class="empty"><p>No shelves assigned yet.</p></div>{% endfor %}</div>
+  <div class="card"><h3>📊 Settlement History</h3>
+  <table><thead><tr><th>Month</th><th>Sales</th><th>Rent</th><th>Balance</th></tr></thead><tbody>
+  {% for h in history %}<tr><td>{{ h.period_month }}</td><td>${{ '%.2f'|format(h.total_sales) }}</td><td>${{ '%.2f'|format(h.total_rent) }}</td>
+  <td class="{% if h.balance >= 0 %}pos{% else %}neg{% endif %}">${{ '%.2f'|format(h.balance) }}</td></tr>{% endfor %}
+  </tbody></table></div>
+</div>
+<div>
+  <div class="card"><h3>📈 How Settlements Work</h3>
+  <div style="font-size:0.87rem;color:#475569;line-height:1.8;">
+    <p>• Items sell through the store POS</p><p>• Sales are credited to your account</p>
+    <p>• Shelf rent is deducted each month</p><p>• Balance = Sales − Rent</p>
+    <p style="margin-top:0.8rem;font-weight:700;color:{% if settlement.balance >= 0 %}#16a34a{% else %}#dc2626{% endif %}">
+    This month: ${{ '%.2f'|format(settlement.total_sales) }} − ${{ '%.2f'|format(settlement.total_rent) }} = 
+    {% if settlement.balance >= 0 %}${{ '%.2f'|format(settlement.balance) }} owed to you
+    {% else %}${{ '%.2f'|format(settlement.balance|abs) }} you owe{% endif %}</p>
+  </div></div>
+  <div class="card"><h3>⚡ Actions</h3>
+  <div style="display:flex;flex-direction:column;gap:0.6rem;">
+    <a href="/vendor/items/add" class="btn btn-p">📦 Add Item to Floor</a>
+    <a href="/vendor/items" class="btn btn-o">📋 My Inventory</a>
+  </div></div>
+</div></div>{% endblock %}

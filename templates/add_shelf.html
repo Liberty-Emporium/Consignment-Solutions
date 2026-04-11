@@ -1,0 +1,9 @@
+{% extends 'base.html' %}{% block title %}Add Shelf{% endblock %}{% block content %}
+<div class="ph"><h1>+ Add Shelf</h1></div>
+<div class="card" style="max-width:460px;"><form method="POST">
+<div class="fg"><label>Shelf Number</label><input name="shelf_number" placeholder="e.g. S-21" required></div>
+<div class="fg"><label>Description</label><input name="description" placeholder="Corner shelf, back wall..."></div>
+<div class="fg"><label>Size</label><select name="size"><option>standard</option><option>small</option><option>large</option><option>corner</option><option>wall</option></select></div>
+<div class="fg"><label>Monthly Rent ($)</label><input type="number" name="monthly_rent" step="0.01" placeholder="50.00" required></div>
+<button type="submit" class="btn btn-p">Add Shelf</button> <a href="/shelves" class="btn btn-g">Cancel</a>
+</form></div>{% endblock %}

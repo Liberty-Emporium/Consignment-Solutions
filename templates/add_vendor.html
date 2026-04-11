@@ -1,0 +1,10 @@
+{% extends 'base.html' %}{% block title %}Add Vendor{% endblock %}{% block content %}
+<div class="ph"><h1>👥 Add Vendor</h1></div>
+<div class="card" style="max-width:480px;"><form method="POST">
+<div class="fg"><label>Full Name</label><input name="name" required></div>
+<div class="fg"><label>Email (used for vendor login)</label><input type="email" name="email" required></div>
+<div class="fg"><label>Phone (optional)</label><input name="phone"></div>
+<div class="fg"><label>Temporary Password</label><input name="password" placeholder="Leave blank to auto-generate"></div>
+<div class="fg"><label>Notes</label><textarea name="notes" rows="2"></textarea></div>
+<button type="submit" class="btn btn-p">Add Vendor</button> <a href="/vendors" class="btn btn-g">Cancel</a>
+</form></div>{% endblock %}

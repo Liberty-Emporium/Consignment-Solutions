@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Consignment Solutions — Run Your Store Like a Pro</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a2e;}
+nav{background:#1a1a2e;padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{color:#fff;font-size:1.2rem;font-weight:800;text-decoration:none;}.logo span{color:#f59e0b;}
+.nav-btns a{color:#cbd5e1;text-decoration:none;margin-left:1rem;font-size:0.9rem;padding:0.4rem 1rem;border-radius:6px;}
+.nav-btns a.btn-cta{background:#f59e0b;color:#1a1a2e;font-weight:700;}
+.hero{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);color:#fff;padding:6rem 2rem;text-align:center;}
+.hero h1{font-size:3rem;font-weight:900;line-height:1.15;margin-bottom:1.2rem;}
+.hero h1 span{color:#f59e0b;}
+.hero p{font-size:1.2rem;color:#94a3b8;max-width:600px;margin:0 auto 2rem;}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+.btn{display:inline-block;padding:0.85rem 2rem;border-radius:10px;font-size:1rem;font-weight:700;text-decoration:none;cursor:pointer;border:none;}
+.btn-primary{background:#f59e0b;color:#1a1a2e;}
+.btn-outline{background:transparent;border:2px solid #fff;color:#fff;}
+.trial-note{color:#64748b;font-size:0.85rem;margin-top:1rem;}
+.features{padding:5rem 2rem;background:#f8fafc;}
+.features h2{text-align:center;font-size:2rem;font-weight:800;margin-bottom:0.5rem;}
+.features .sub{text-align:center;color:#64748b;margin-bottom:3rem;}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;max-width:1100px;margin:0 auto;}
+.feat{background:#fff;border-radius:14px;padding:2rem;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.feat-icon{font-size:2.2rem;margin-bottom:1rem;}
+.feat h3{font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;}
+.feat p{color:#64748b;font-size:0.9rem;line-height:1.6;}
+.how{padding:5rem 2rem;background:#fff;}
+.how h2{text-align:center;font-size:2rem;font-weight:800;margin-bottom:3rem;}
+.steps{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;max-width:900px;margin:0 auto;}
+.step{text-align:center;max-width:200px;}
+.step-num{width:50px;height:50px;background:#f59e0b;color:#1a1a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:900;margin:0 auto 1rem;}
+.step h4{font-weight:700;margin-bottom:0.4rem;}
+.step p{color:#64748b;font-size:0.85rem;}
+.pricing-section{background:#f8fafc;padding:5rem 2rem;}
+.pricing-section h2{text-align:center;font-size:2rem;font-weight:800;margin-bottom:0.5rem;}
+.pricing-section .sub{text-align:center;color:#64748b;margin-bottom:3rem;}
+.price-card{background:#fff;border-radius:16px;padding:2.5rem;max-width:420px;margin:0 auto;box-shadow:0 4px 20px rgba(0,0,0,0.1);border:2px solid #f59e0b;text-align:center;}
+.price-amount{font-size:3.5rem;font-weight:900;color:#1a1a2e;}
+.price-amount span{font-size:1.2rem;color:#64748b;font-weight:400;}
+.price-desc{color:#64748b;margin:0.5rem 0 1.5rem;}
+.price-features{list-style:none;text-align:left;margin-bottom:2rem;}
+.price-features li{padding:0.5rem 0;border-bottom:1px solid #f1f5f9;font-size:0.9rem;}
+.price-features li::before{content:"✅ ";margin-right:0.3rem;}
+.cta{background:linear-gradient(135deg,#1a1a2e,#0f3460);padding:5rem 2rem;text-align:center;color:#fff;}
+.cta h2{font-size:2.2rem;font-weight:800;margin-bottom:1rem;}
+.cta p{color:#94a3b8;margin-bottom:2rem;font-size:1.1rem;}
+footer{background:#1a1a2e;color:#64748b;text-align:center;padding:2rem;font-size:0.85rem;}
+@media(max-width:600px){.hero h1{font-size:2rem;}}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="/">Consignment <span>Solutions</span></a>
+  <div class="nav-btns">
+    <a href="/store/login">Log In</a>
+    <a href="/signup" class="btn-cta">Start Free Trial</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>Run Your Consignment Store<br><span>Like a Pro</span></h1>
+  <p>Track vendors, shelf rentals, inventory, and sales — all in one place. Rent is automatically deducted from vendor sales every month.</p>
+  <div class="hero-btns">
+    <a href="/signup" class="btn btn-primary">Start Free 14-Day Trial →</a>
+    <a href="#features" class="btn btn-outline">See Features</a>
+  </div>
+  <p class="trial-note">No credit card required • 14 days free • $49/month after</p>
+</section>
+
+<section class="features" id="features">
+  <h2>Everything You Need to Run Your Store</h2>
+  <p class="sub">Built specifically for consignment and antique shops</p>
+  <div class="feat-grid">
+    <div class="feat"><div class="feat-icon">🗄️</div><h3>Shelf Management</h3><p>Assign shelves to vendors, set monthly rent, track which shelves are available or occupied — all from one dashboard.</p></div>
+    <div class="feat"><div class="feat-icon">💲</div><h3>Auto Settlement</h3><p>At the end of each month, rent is automatically deducted from vendor sales. You see instantly who to pay out and who owes you.</p></div>
+    <div class="feat"><div class="feat-icon">📦</div><h3>Inventory Tracking</h3><p>Vendors add their items to the system. Sync items to your Square POS so everything is tracked when it sells.</p></div>
+    <div class="feat"><div class="feat-icon">🟦</div><h3>Square Integration</h3><p>Connect your Square POS. When an item sells at your register, it's automatically logged to the right vendor's account.</p></div>
+    <div class="feat"><div class="feat-icon">👥</div><h3>Vendor Portal</h3><p>Each vendor gets their own login to see their sales, settlement balance, and add inventory — without seeing other vendors' data.</p></div>
+    <div class="feat"><div class="feat-icon">🤖</div><h3>AI Assistant</h3><p>Ask your built-in AI anything — "Who owes rent this month?" or "Which vendor sold the most?" — get instant answers.</p></div>
+  </div>
+</section>
+
+<section class="how">
+  <h2>How It Works</h2>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><h4>Vendor Rents a Shelf</h4><p>You assign them a shelf with a monthly rent amount</p></div>
+    <div class="step"><div class="step-num">2</div><h4>They Add Their Items</h4><p>Vendor logs in and adds items to their shelf inventory</p></div>
+    <div class="step"><div class="step-num">3</div><h4>Items Sell via Square</h4><p>Sales are automatically tracked and credited to the vendor</p></div>
+    <div class="step"><div class="step-num">4</div><h4>Rent Deducted Monthly</h4><p>App calculates: Sales − Rent = Payout (or balance owed)</p></div>
+  </div>
+</section>
+
+<section class="pricing-section" id="pricing">
+  <h2>Simple, Flat Pricing</h2>
+  <p class="sub">One price. All features. No limits on vendors or shelves.</p>
+  <div class="price-card">
+    <div class="price-amount">$49<span>/month</span></div>
+    <p class="price-desc">Everything included, cancel anytime</p>
+    <ul class="price-features">
+      <li>Unlimited vendors</li>
+      <li>Unlimited shelves & inventory items</li>
+      <li>Square POS integration</li>
+      <li>Vendor portal logins</li>
+      <li>Monthly settlement reports</li>
+      <li>AI assistant</li>
+      <li>14-day free trial</li>
+    </ul>
+    <a href="/signup" class="btn btn-primary" style="width:100%;display:block;text-align:center;">Start Free Trial →</a>
+  </div>
+</section>
+
+<section class="cta">
+  <h2>Ready to Get Organized?</h2>
+  <p>Join consignment store owners already using Consignment Solutions</p>
+  <a href="/signup" class="btn btn-primary">Start Your Free 14-Day Trial</a>
+</section>
+
+<footer>
+  <p>© 2024 Consignment Solutions · <a href="/store/login" style="color:#64748b;">Store Login</a> · <a href="/vendor/login" style="color:#64748b;">Vendor Login</a></p>
+</footer>
+</body>
+</html>

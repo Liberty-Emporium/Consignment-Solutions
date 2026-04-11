@@ -1,0 +1,15 @@
+{% extends 'base.html' %}{% block title %}Settlements{% endblock %}{% block content %}
+<div class="ph"><div><h1>📊 Settlements — {{ month }}</h1></div>
+<div style="display:flex;gap:0.5rem;align-items:center;">
+<form method="GET" style="display:flex;gap:0.5rem;"><input type="month" name="month" value="{{ month }}" style="width:auto;"><button class="btn btn-g btn-sm">Filter</button></form>
+<a href="/settlements/payment" class="btn btn-s">+ Record Payment</a></div></div>
+<div class="card">{% if data %}
+<table><thead><tr><th>Vendor</th><th>Sales</th><th>Shelf Rent</th><th>Cash Paid</th><th>Balance</th><th>Status</th><th></th></tr></thead><tbody>
+{% for d in data %}<tr>
+<td><strong><a href="/vendors/{{ d.vendor.id }}">{{ d.vendor.name }}</a></strong></td>
+<td>${{ '%.2f'|format(d.total_sales) }}</td><td>${{ '%.2f'|format(d.total_rent) }}</td><td>${{ '%.2f'|format(d.direct_paid) }}</td>
+<td class="{% if d.balance >= 0 %}pos{% else %}neg{% endif %}">{% if d.balance >= 0 %}▲ Store owes ${{ '%.2f'|format(d.balance) }}{% else %}▼ Vendor owes ${{ '%.2f'|format(d.balance|abs) }}{% endif %}</td>
+<td><span class="badge {% if d.balance > 0 %}bg{% elif d.balance == 0 %}bk{% else %}br{% endif %}">{% if d.balance > 0 %}Payout due{% elif d.balance == 0 %}Even{% else %}Owes store{% endif %}</span></td>
+<td><a href="/settlements/payment?vendor={{ d.vendor.id }}" class="btn btn-sm btn-g">+ Payment</a></td>
+</tr>{% endfor %}</tbody></table>
+{% else %}<div class="empty"><div class="ei">📊</div><p>No active vendors with rent this month.</p></div>{% endif %}</div>{% endblock %}

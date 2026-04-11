@@ -1,0 +1,29 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Start Free Trial | Consignment Solutions</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);min-height:100vh;display:flex;align-items:center;justify-content:center;}
+.box{background:rgba(255,255,255,0.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:2.5rem;width:100%;max-width:440px;}
+h1{color:#fff;font-size:1.6rem;text-align:center;margin-bottom:0.2rem;}h1 span{color:#f59e0b;}
+.sub{color:#94a3b8;text-align:center;margin-bottom:1.5rem;font-size:0.85rem;}
+.trial-badge{background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:0.7rem;margin-bottom:1.5rem;color:#fcd34d;font-size:0.8rem;text-align:center;}
+label{display:block;color:#cbd5e1;font-weight:600;margin-bottom:0.35rem;font-size:0.83rem;}
+input{width:100%;padding:0.72rem;border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;background:rgba(255,255,255,0.08);color:#fff;font-size:0.93rem;margin-bottom:1rem;}
+input::placeholder{color:#64748b;}input:focus{outline:none;border-color:#f59e0b;}
+.btn{width:100%;padding:0.85rem;background:#f59e0b;color:#1a1a2e;border:none;border-radius:10px;font-size:1rem;font-weight:800;cursor:pointer;}
+.link{text-align:center;margin-top:1rem;color:#94a3b8;font-size:0.82rem;}.link a{color:#f59e0b;text-decoration:none;}
+.alert{padding:0.7rem;border-radius:8px;margin-bottom:0.8rem;background:rgba(239,68,68,0.15);color:#fca5a5;font-size:0.83rem;}
+</style></head><body>
+<div class="box">
+  <h1>Consignment <span>Solutions</span></h1>
+  <p class="sub">Create your store account</p>
+  <div class="trial-badge">🎉 14-day free trial · No credit card required · $49/month after</div>
+  {% with messages = get_flashed_messages(with_categories=true) %}{% for c,m in messages %}<div class="alert">{{ m }}</div>{% endfor %}{% endwith %}
+  <form method="POST">
+    <label>Store Name</label><input name="store_name" placeholder="e.g. Main Street Consignment" required>
+    <label>Your Email</label><input type="email" name="email" placeholder="you@email.com" required>
+    <label>Phone (optional)</label><input name="phone" placeholder="555-1234">
+    <label>Password</label><input type="password" name="password" placeholder="Choose a password" required>
+    <button class="btn">Start Free Trial →</button>
+  </form>
+  <div class="link">Already have an account? <a href="/store/login">Log in</a></div>
+</div>
+</body></html>

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% block title %}Add Item{% endblock %}{% block content %}
+<div class="ph"><h1>📦 Add Item</h1></div>
+<div class="card" style="max-width:500px;"><form method="POST">
+<div class="fg"><label>Vendor</label><select name="vendor_id" required>{% for v in vendors %}<option value="{{ v.id }}">{{ v.name }}</option>{% endfor %}</select></div>
+<div class="fg"><label>Item Name</label><input name="name" required></div>
+<div class="fg"><label>Description</label><textarea name="description" rows="2"></textarea></div>
+<div class="g2"><div class="fg"><label>Price ($)</label><input type="number" name="price" step="0.01" required></div>
+<div class="fg"><label>Quantity</label><input type="number" name="quantity" value="1"></div></div>
+<div class="g2"><div class="fg"><label>Category</label><input name="category"></div>
+<div class="fg"><label>SKU</label><input name="sku"></div></div>
+<div class="fg"><label>Shelf</label><select name="shelf_id"><option value="">— No specific shelf —</option>{% for s in shelves %}<option value="{{ s.id }}">{{ s.shelf_number }}</option>{% endfor %}</select></div>
+<button type="submit" class="btn btn-p">Add Item</button> <a href="/items" class="btn btn-g">Cancel</a>
+</form></div>{% endblock %}

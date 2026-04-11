@@ -1,0 +1,46 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Platform Admin | Consignment Solutions</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;}
+nav{background:#0f172a;padding:0 2rem;height:54px;display:flex;align-items:center;justify-content:space-between;}
+.logo{color:#fff;font-weight:800;font-size:1rem;}.logo span{color:#f59e0b;}
+.main{max-width:1200px;margin:0 auto;padding:1.5rem 1rem;}
+h1{font-size:1.5rem;font-weight:800;margin-bottom:1.5rem;}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:1.5rem;}
+.stat{background:#fff;border-radius:10px;padding:1.2rem;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-left:4px solid #f59e0b;}
+.sv{font-size:1.8rem;font-weight:800;}.sl{color:#64748b;font-size:0.77rem;margin-top:0.3rem;}
+.card{background:#fff;border-radius:10px;padding:1.5rem;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-bottom:1rem;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;padding:0.6rem 0.8rem;background:#f8fafc;font-size:0.7rem;text-transform:uppercase;color:#64748b;border-bottom:2px solid #e2e8f0;}
+td{padding:0.6rem 0.8rem;border-bottom:1px solid #f1f5f9;font-size:0.85rem;}
+.badge{display:inline-block;padding:0.18rem 0.5rem;border-radius:20px;font-size:0.7rem;font-weight:700;}
+.bg{background:#dcfce7;color:#16a34a;}.br{background:#fee2e2;color:#dc2626;}.by{background:#fef9c3;color:#b45309;}.bk{background:#f1f5f9;color:#64748b;}
+.btn{display:inline-block;padding:0.3rem 0.7rem;border-radius:6px;border:none;cursor:pointer;font-size:0.76rem;font-weight:600;text-decoration:none;}
+.btn-s{background:#10b981;color:#fff;}.btn-d{background:#ef4444;color:#fff;}
+</style></head><body>
+<nav><span class="logo">Consignment <span>Solutions</span> — Platform Admin</span><a href="/admin/logout" style="color:#94a3b8;font-size:0.85rem;text-decoration:none;">Logout</a></nav>
+<div class="main">
+<h1>📊 Platform Overview</h1>
+<div class="sg">
+  <div class="stat" style="border-color:#f59e0b"><div class="sv">{{ total }}</div><div class="sl">Total Stores</div></div>
+  <div class="stat" style="border-color:#10b981"><div class="sv">{{ active }}</div><div class="sl">Active (Paying)</div></div>
+  <div class="stat" style="border-color:#3b82f6"><div class="sv">{{ trial }}</div><div class="sl">On Trial</div></div>
+  <div class="stat" style="border-color:#ef4444"><div class="sv">{{ inactive }}</div><div class="sl">Inactive</div></div>
+  <div class="stat" style="border-color:#8b5cf6"><div class="sv">${{ '%.0f'|format(mrr) }}</div><div class="sl">MRR</div></div>
+</div>
+<div class="card">
+<h3 style="margin-bottom:1rem;">🏪 All Stores</h3>
+<table><thead><tr><th>Store Name</th><th>Email</th><th>Vendors</th><th>Status</th><th>Trial Ends</th><th>Joined</th><th>Actions</th></tr></thead><tbody>
+{% for s in stores %}<tr>
+<td><strong>{{ s.name }}</strong></td>
+<td>{{ s.email }}</td>
+<td>{{ s.vendor_count }}</td>
+<td><span class="badge {% if s.status=='active' %}bg{% elif s.status=='trial' %}by{% else %}br{% endif %}">{{ s.status }}</span></td>
+<td>{{ s.trial_ends or '—' }}</td>
+<td>{{ s.created_at[:10] }}</td>
+<td style="display:flex;gap:4px;">
+{% if s.status != 'active' %}<form method="POST" action="/admin/store/{{ s.id }}/activate" style="display:inline;"><button class="btn btn-s">Activate</button></form>{% endif %}
+{% if s.status != 'suspended' %}<form method="POST" action="/admin/store/{{ s.id }}/suspend" style="display:inline;"><button class="btn btn-d" onclick="return confirm('Suspend?')">Suspend</button></form>{% endif %}
+</td>
+</tr>{% endfor %}</tbody></table>
+</div>
+</div>
+</body></html>

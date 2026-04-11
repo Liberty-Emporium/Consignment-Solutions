@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% block title %}Vendors{% endblock %}{% block content %}
+<div class="ph"><div><h1>👥 Vendors</h1><p>{{ month }}</p></div><a href="/vendors/add" class="btn btn-p">+ Add Vendor</a></div>
+<div class="card">{% if vendors %}
+<table><thead><tr><th>Name</th><th>Email / Phone</th><th>Shelves</th><th>Sales {{ month }}</th><th>Balance</th><th></th></tr></thead><tbody>
+{% for v in vendors %}<tr>
+<td><strong>{{ v.name }}</strong></td>
+<td><small>{{ v.email }}<br>{{ v.phone }}</small></td>
+<td><span class="badge bb">{{ v.shelf_count }}</span></td>
+<td>${{ '%.2f'|format(v.settlement.total_sales) }}</td>
+<td class="{% if v.settlement.balance >= 0 %}pos{% else %}neg{% endif %}">${{ '%.2f'|format(v.settlement.balance) }}</td>
+<td><a href="/vendors/{{ v.id }}" class="btn btn-sm btn-o">View</a></td>
+</tr>{% endfor %}</tbody></table>
+{% else %}<div class="empty"><div class="ei">👥</div><p>No vendors yet. <a href="/vendors/add">Add one</a></p></div>{% endif %}</div>{% endblock %}

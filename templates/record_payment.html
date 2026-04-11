@@ -1,0 +1,12 @@
+{% extends 'base.html' %}{% block title %}Record Payment{% endblock %}{% block content %}
+<div class="ph"><h1>💰 Record Rent Payment</h1></div>
+<div class="card" style="max-width:460px;"><form method="POST">
+<div class="fg"><label>Vendor</label><select name="vendor_id" required>{% for v in vendors %}<option value="{{ v.id }}" {% if request.args.get('vendor')==v.id|string %}selected{% endif %}>{{ v.name }}</option>{% endfor %}</select></div>
+<div class="fg"><label>Shelf (optional)</label><select name="shelf_id"><option value="">— General —</option>{% for s in shelves %}<option value="{{ s.id }}">{{ s.shelf_number }}</option>{% endfor %}</select></div>
+<div class="fg"><label>Amount ($)</label><input type="number" name="amount" step="0.01" required></div>
+<div class="fg"><label>Payment Date</label><input type="date" name="payment_date" value="{{ today }}" required></div>
+<div class="fg"><label>Period Month</label><input name="period_month" value="{{ this_month }}"></div>
+<div class="fg"><label>Method</label><select name="method"><option>cash</option><option>card</option><option>check</option><option>venmo</option><option>zelle</option><option>cashapp</option></select></div>
+<div class="fg"><label>Notes</label><input name="notes"></div>
+<button type="submit" class="btn btn-s">Record Payment</button> <a href="/settlements" class="btn btn-g">Cancel</a>
+</form></div>{% endblock %}

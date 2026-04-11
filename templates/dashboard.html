@@ -1,0 +1,57 @@
+{% extends 'base.html' %}{% block title %}Dashboard | {{ session.store_name }}{% endblock %}{% block content %}
+{% if store.status == 'trial' %}
+<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:0.8rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:#92400e;">
+  ⏳ <strong>Free trial</strong> — expires {{ store.trial_ends }}. <a href="/pricing" style="color:#d97706;font-weight:700;">Subscribe to keep access →</a>
+</div>
+{% endif %}
+<div class="ph"><div><h1>🏪 Dashboard</h1><p>{{ month }} — {{ session.store_name }}</p></div></div>
+<div class="sg">
+  <div class="stat" style="border-color:#f59e0b"><div class="sv">{{ total_vendors }}</div><div class="sl">👥 Active Vendors</div></div>
+  <div class="stat" style="border-color:#6c63ff"><div class="sv">{{ rented_shelves }}/{{ total_shelves }}</div><div class="sl">🗄️ Shelves Rented</div></div>
+  <div class="stat" style="border-color:#10b981"><div class="sv">${{ '%.2f'|format(month_sales) }}</div><div class="sl">💲 Sales This Month</div></div>
+  <div class="stat" style="border-color:#3b82f6"><div class="sv">${{ '%.2f'|format(monthly_rent) }}</div><div class="sl">🏷️ Rent Owed</div></div>
+  <div class="stat" style="border-color:#8b5cf6"><div class="sv">{{ total_items }}</div><div class="sl">📦 Items on Floor</div></div>
+  <div class="stat" style="border-color:{% if behind %}#ef4444{% else %}#10b981{% endif %}"><div class="sv">{{ behind|length }}</div><div class="sl">⚠️ Behind on Rent</div></div>
+</div>
+<div class="g2">
+<div>
+  {% if behind %}
+  <div class="card"><h3 style="color:#ef4444;">⚠️ Vendors Behind on Rent</h3>
+  <table><thead><tr><th>Vendor</th><th>Sales</th><th>Rent</th><th>Owes</th><th></th></tr></thead><tbody>
+  {% for v in behind %}<tr>
+    <td><strong>{{ v.name }}</strong></td>
+    <td>${{ '%.2f'|format(v.total_sales) }}</td>
+    <td>${{ '%.2f'|format(v.total_rent) }}</td>
+    <td class="neg">${{ '%.2f'|format(v.balance|abs) }}</td>
+    <td><a href="/settlements/payment?vendor={{ v.id }}" class="btn btn-sm btn-s">+ Payment</a></td>
+  </tr>{% endfor %}</tbody></table></div>
+  {% endif %}
+  <div class="card"><h3>💲 Recent Sales</h3>
+  {% if recent_sales %}
+  <table><thead><tr><th>Item</th><th>Vendor</th><th>Amount</th><th>Date</th><th>Via</th></tr></thead><tbody>
+  {% for s in recent_sales %}<tr>
+    <td>{{ s.item_name }}</td><td>{{ s.vendor_name }}</td>
+    <td><strong>${{ '%.2f'|format(s.total_amount) }}</strong></td>
+    <td>{{ s.sale_date }}</td>
+    <td><span class="badge {% if s.source=='square' %}bb{% else %}bk{% endif %}">{{ s.source }}</span></td>
+  </tr>{% endfor %}</tbody></table>
+  {% else %}<div class="empty"><div class="ei">💲</div><p>No sales yet this month</p></div>{% endif %}</div>
+</div>
+<div>
+  <div class="card"><h3>⚡ Quick Actions</h3>
+  <div style="display:flex;flex-direction:column;gap:0.6rem;">
+    <a href="/sales/add" class="btn btn-p">💲 Record a Sale</a>
+    <a href="/shelves/assign" class="btn btn-s">🗄️ Assign Shelf to Vendor</a>
+    <a href="/settlements/payment" class="btn btn-g">💰 Record Rent Payment</a>
+    <a href="/vendors/add" class="btn btn-o">👥 Add Vendor</a>
+    <a href="/items/add" class="btn btn-o">📦 Add Item</a>
+    <a href="/ai" class="btn btn-o">🤖 Ask AI</a>
+  </div></div>
+  <div class="card"><h3>🗄️ Shelf Status</h3>
+  <div style="display:flex;gap:1rem;text-align:center;margin-bottom:1rem;">
+    <div style="flex:1;padding:0.9rem;background:#dcfce7;border-radius:8px;"><div style="font-size:1.7rem;font-weight:800;color:#16a34a;">{{ available }}</div><div style="font-size:0.78rem;color:#16a34a;">Available</div></div>
+    <div style="flex:1;padding:0.9rem;background:#dbeafe;border-radius:8px;"><div style="font-size:1.7rem;font-weight:800;color:#2563eb;">{{ rented_shelves }}</div><div style="font-size:0.78rem;color:#2563eb;">Rented</div></div>
+  </div>
+  <a href="/shelves" class="btn btn-o" style="display:block;text-align:center;">View All Shelves</a></div>
+</div></div>
+{% endblock %}

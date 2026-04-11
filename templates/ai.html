@@ -1,0 +1,21 @@
+{% extends 'base.html' %}{% block title %}AI Assistant{% endblock %}{% block content %}
+<div class="ph"><h1>🤖 AI Assistant</h1><p>Ask anything about your vendors, sales, or settlements</p></div>
+<div class="card" style="max-width:780px;">
+<div id="chat" style="height:370px;overflow-y:auto;padding:1rem;background:#f8fafc;border-radius:8px;margin-bottom:1rem;display:flex;flex-direction:column;gap:0.8rem;">
+<div style="background:#f59e0b;color:#1a1a2e;padding:0.8rem 1rem;border-radius:12px 12px 12px 0;max-width:85%;align-self:flex-start;font-weight:600;">
+👋 Hi! I have access to your store data. Ask me anything — who owes rent, top vendors, settlement totals, anything!
+</div></div>
+<div style="display:flex;gap:0.5rem;"><input type="text" id="inp" placeholder="Ask me anything..." style="flex:1;" onkeypress="if(event.key==='Enter')send()"><button onclick="send()" class="btn btn-p" id="sb">Send →</button></div>
+<div style="margin-top:0.8rem;"><p style="font-size:0.77rem;color:#94a3b8;margin-bottom:0.4rem;">Try:</p>
+<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">
+{% for q in ["Who owes rent this month?","Total sales this month?","Which vendor sold the most?","How many shelves available?","Summarize settlements"] %}
+<button onclick="qa('{{ q }}')" style="padding:0.22rem 0.65rem;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:20px;font-size:0.76rem;cursor:pointer;color:#475569;">{{ q }}</button>{% endfor %}
+</div></div></div>
+<script>
+function send(){const i=document.getElementById('inp');const m=i.value.trim();if(!m)return;add(m,'u');i.value='';document.getElementById('sb').textContent='...';document.getElementById('sb').disabled=true;
+fetch('/api/ai/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:m})})
+.then(r=>r.json()).then(d=>{add(d.response||d.error,'a');document.getElementById('sb').textContent='Send →';document.getElementById('sb').disabled=false;})
+.catch(()=>{add('Error. Add AI key in Settings.','a');document.getElementById('sb').textContent='Send →';document.getElementById('sb').disabled=false;});}
+function qa(q){document.getElementById('inp').value=q;send();}
+function add(t,r){const d=document.createElement('div');d.style.cssText=r==='u'?'background:#1a1a2e;color:#fff;padding:0.75rem 1rem;border-radius:12px 12px 0 12px;max-width:85%;align-self:flex-end;':'background:#f59e0b;color:#1a1a2e;padding:0.75rem 1rem;border-radius:12px 12px 12px 0;max-width:85%;align-self:flex-start;';d.textContent=t;const c=document.getElementById('chat');c.appendChild(d);c.scrollTop=c.scrollHeight;}
+</script>{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}{% block title %}{{ vendor.name }}{% endblock %}{% block content %}
+<div class="ph"><div><h1>{{ vendor.name }}</h1><p>{{ vendor.email }} {% if vendor.phone %}· {{ vendor.phone }}{% endif %}</p></div>
+<div style="display:flex;gap:0.5rem;"><a href="/sales/add" class="btn btn-p">+ Sale</a><a href="/settlements/payment?vendor={{ vendor.id }}" class="btn btn-s">+ Payment</a></div></div>
+<div class="sg">
+  <div class="stat" style="border-color:#f59e0b"><div class="sv">{{ shelves|length }}</div><div class="sl">Shelves</div></div>
+  <div class="stat" style="border-color:#10b981"><div class="sv">${{ '%.2f'|format(settlement.total_sales) }}</div><div class="sl">Sales This Month</div></div>
+  <div class="stat" style="border-color:#ef4444"><div class="sv">${{ '%.2f'|format(settlement.total_rent) }}</div><div class="sl">Rent This Month</div></div>
+  <div class="stat" style="border-color:{% if settlement.balance >= 0 %}#10b981{% else %}#ef4444{% endif %}">
+    <div class="sv {% if settlement.balance >= 0 %}pos{% else %}neg{% endif %}">${{ '%.2f'|format(settlement.balance) }}</div>
+    <div class="sl">{% if settlement.balance >= 0 %}Store Owes Vendor{% else %}Vendor Owes Store{% endif %}</div>
+  </div>
+</div>
+<div class="g2">
+<div>
+<div class="card"><h3>🗄️ Shelves</h3>{% for s in shelves %}
+<div style="display:flex;justify-content:space-between;align-items:center;padding:0.7rem;background:#f8fafc;border-radius:8px;margin-bottom:0.4rem;">
+<div><strong>{{ s.shelf_number }}</strong> — {{ s.size }}<br><small>Since {{ s.start_date }}</small></div>
+<div style="text-align:right;"><strong>${{ '%.2f'|format(s.monthly_rent) }}/mo</strong><br>
+<span class="badge {% if s.status=='active' %}bg{% else %}bk{% endif %}">{{ s.status }}</span>
+{% if s.status=='active' %}<form method="POST" action="/shelves/release/{{ s.id }}" style="display:inline;margin-left:4px;"><button class="btn btn-sm btn-d" onclick="return confirm('Release?')">Release</button></form>{% endif %}
+</div></div>{% else %}<div class="empty"><p>No shelves assigned</p></div>{% endfor %}</div>
+<div class="card"><h3>📊 Settlement History</h3>
+<table><thead><tr><th>Month</th><th>Sales</th><th>Rent</th><th>Balance</th></tr></thead><tbody>
+{% for h in history %}<tr><td>{{ h.period_month }}</td><td>${{ '%.2f'|format(h.total_sales) }}</td><td>${{ '%.2f'|format(h.total_rent) }}</td>
+<td class="{% if h.balance >= 0 %}pos{% else %}neg{% endif %}">${{ '%.2f'|format(h.balance) }}</td></tr>{% endfor %}
+</tbody></table></div>
+</div>
+<div>
+<div class="card"><h3>📦 Items ({{ items|length }})</h3>
+<table><thead><tr><th>Item</th><th>Price</th><th>Qty</th><th>Sold</th></tr></thead><tbody>
+{% for i in items %}<tr><td>{{ i.name }}</td><td>${{ '%.2f'|format(i.price) }}</td><td>{{ i.quantity }}</td><td>{{ i.quantity_sold }}</td></tr>{% endfor %}
+</tbody></table></div>
+<div class="card"><h3>💲 Recent Sales</h3>
+<table><thead><tr><th>Item</th><th>Qty</th><th>Amount</th><th>Date</th></tr></thead><tbody>
+{% for s in sales %}<tr><td>{{ s.item_name }}</td><td>{{ s.quantity }}</td><td>${{ '%.2f'|format(s.total_amount) }}</td><td>{{ s.sale_date }}</td></tr>{% endfor %}
+</tbody></table></div>
+</div></div>
+<a href="/vendors" class="btn btn-g">← Back</a>{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}{% block title %}Shelves{% endblock %}{% block content %}
+<div class="ph"><div><h1>🗄️ Shelves</h1></div>
+<div style="display:flex;gap:0.5rem;"><a href="/shelves/add" class="btn btn-g">+ New Shelf</a><a href="/shelves/assign" class="btn btn-p">Assign to Vendor</a></div></div>
+<div class="card"><table><thead><tr><th>Shelf #</th><th>Size</th><th>Rent/mo</th><th>Status</th><th>Vendor</th><th></th></tr></thead><tbody>
+{% for s in shelves %}<tr>
+<td><strong>{{ s.shelf_number }}</strong></td><td>{{ s.size }}</td><td>${{ '%.2f'|format(s.monthly_rent) }}</td>
+<td><span class="badge {% if s.status=='available' %}bg{% elif s.status=='rented' %}bb{% else %}bk{% endif %}">{{ s.status }}</span></td>
+<td>{% if s.vendor_name %}<a href="/vendors/{{ s.vendor_id }}">{{ s.vendor_name }}</a>{% else %}—{% endif %}</td>
+<td>{% if s.status=='available' %}<a href="/shelves/assign" class="btn btn-sm btn-p">Assign</a>
+{% elif s.vendor_id %}<a href="/vendors/{{ s.vendor_id }}" class="btn btn-sm btn-o">Vendor</a>{% endif %}</td>
+</tr>{% endfor %}</tbody></table></div>{% endblock %}
