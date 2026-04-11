@@ -6,14 +6,19 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh;}
-.nav{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.3);}
-.nav-brand{color:#fff;font-size:1.1rem;font-weight:800;text-decoration:none;}.nav-brand span{color:#f59e0b;}
-.nav-sub{color:#64748b;font-size:0.75rem;margin-left:0.5rem;}
-.nav-links{display:flex;gap:0.25rem;align-items:center;}
-.nav-links a{color:#cbd5e1;text-decoration:none;padding:0.4rem 0.7rem;border-radius:6px;font-size:0.82rem;transition:0.15s;white-space:nowrap;}
-.nav-links a:hover{background:rgba(245,158,11,0.15);color:#f59e0b;}
-.nav-user{color:#94a3b8;font-size:0.78rem;display:flex;align-items:center;gap:0.5rem;}
-.nav-user a{color:#94a3b8;text-decoration:none;}.nav-user a:hover{color:#f59e0b;}
+/* ── Navbar ── */
+.nav{background:#1a1a2e;border-bottom:1px solid rgba(255,255,255,0.07);position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.3);}
+.nav-top{padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:52px;}
+.nav-brand{color:#fff;font-size:1.05rem;font-weight:800;text-decoration:none;white-space:nowrap;}
+.nav-brand span{color:#f59e0b;}
+.nav-store{color:#64748b;font-size:0.75rem;margin-left:0.4rem;}
+.nav-user{color:#94a3b8;font-size:0.8rem;display:flex;align-items:center;gap:0.8rem;white-space:nowrap;}
+.nav-user a{color:#94a3b8;text-decoration:none;padding:0.3rem 0.7rem;border:1px solid rgba(255,255,255,0.12);border-radius:6px;font-size:0.78rem;}
+.nav-user a:hover{color:#f59e0b;border-color:#f59e0b;}
+.nav-links{background:#16213e;border-top:1px solid rgba(255,255,255,0.06);padding:0 1.5rem;display:flex;gap:0.2rem;align-items:center;height:40px;overflow-x:auto;}
+.nav-links::-webkit-scrollbar{display:none;}
+.nav-links a{color:#94a3b8;text-decoration:none;padding:0.3rem 0.9rem;border-radius:6px;font-size:0.83rem;white-space:nowrap;transition:0.15s;display:flex;align-items:center;gap:0.35rem;}
+.nav-links a:hover{background:rgba(245,158,11,0.12);color:#f59e0b;}
 .main{max-width:1200px;margin:0 auto;padding:1.5rem 1rem;}
 .ph{margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;}
 .ph h1{font-size:1.6rem;font-weight:800;}.ph p{color:#64748b;font-size:0.88rem;margin-top:0.2rem;}
@@ -55,41 +60,43 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#f59e0b;box-sh
 </head>
 <body>
 {% if session.store_id and session.role != 'vendor' %}
-{% set store_obj = None %}
 <nav class="nav">
-  <div style="display:flex;align-items:center;gap:0.5rem;">
-    <a class="nav-brand" href="/dashboard">Consignment <span>Solutions</span></a>
-    <span class="nav-sub">| {{ session.store_name }}</span>
+  <div class="nav-top">
+    <div style="display:flex;align-items:center;">
+      <a class="nav-brand" href="/dashboard">Consignment <span>Solutions</span></a>
+      <span class="nav-store">· {{ session.store_name }}</span>
+    </div>
+    <div class="nav-user">
+      <a href="/store/logout">Logout</a>
+    </div>
   </div>
   <div class="nav-links">
-    <a href="/dashboard">🏠</a>
-    <a href="/vendors">👥 <span>Vendors</span></a>
-    <a href="/shelves">🗄️ <span>Shelves</span></a>
-    <a href="/items">📦 <span>Items</span></a>
-    <a href="/sales">💲 <span>Sales</span></a>
-    <a href="/settlements">📊 <span>Settlements</span></a>
-    <a href="/ai">🤖 <span>AI</span></a>
-    <a href="/settings">⚙️</a>
-  </div>
-  <div class="nav-user">
-    <span>{{ session.store_name }}</span>
-    <a href="/store/logout">Logout</a>
+    <a href="/dashboard">🏠 Dashboard</a>
+    <a href="/vendors">👥 Vendors</a>
+    <a href="/shelves">🗄️ Shelves</a>
+    <a href="/items">📦 Items</a>
+    <a href="/sales">💲 Sales</a>
+    <a href="/settlements">📊 Settlements</a>
+    <a href="/ai">🤖 AI Assistant</a>
+    <a href="/settings">⚙️ Settings</a>
   </div>
 </nav>
 {% elif session.vendor_id %}
 <nav class="nav">
-  <div style="display:flex;align-items:center;gap:0.5rem;">
-    <a class="nav-brand" href="/vendor/dashboard">Consignment <span>Solutions</span></a>
-    <span class="nav-sub">| {{ session.store_name }}</span>
+  <div class="nav-top">
+    <div style="display:flex;align-items:center;">
+      <a class="nav-brand" href="/vendor/dashboard">Consignment <span>Solutions</span></a>
+      <span class="nav-store">· {{ session.store_name }}</span>
+    </div>
+    <div class="nav-user">
+      <span style="color:#fff;">{{ session.vendor_name }}</span>
+      <a href="/vendor/logout">Logout</a>
+    </div>
   </div>
   <div class="nav-links">
-    <a href="/vendor/dashboard">🏠 <span>Dashboard</span></a>
-    <a href="/vendor/items">📦 <span>My Items</span></a>
-    <a href="/vendor/items/add">+ <span>Add Item</span></a>
-  </div>
-  <div class="nav-user">
-    <span>{{ session.vendor_name }}</span>
-    <a href="/vendor/logout">Logout</a>
+    <a href="/vendor/dashboard">🏠 Dashboard</a>
+    <a href="/vendor/items">📦 My Items</a>
+    <a href="/vendor/items/add">➕ Add Item</a>
   </div>
 </nav>
 {% endif %}
