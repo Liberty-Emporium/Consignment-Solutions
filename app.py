@@ -184,12 +184,26 @@ def init_db():
         );
     ''')
 
-    # Default super admin (Jay)
+    # Default super admin
     sa = db.execute("SELECT id FROM super_admins LIMIT 1").fetchone()
     if not sa:
         pwd = hashlib.sha256('admin1'.encode()).hexdigest()
         db.execute("INSERT INTO super_admins (name,email,password) VALUES (?,?,?)",
-                   ('Jay Alexander', 'jay@consignmentsolutions.com', pwd))
+                   ('Admin', 'admin', pwd))
+
+    # Default test store
+    ts = db.execute("SELECT id FROM stores WHERE email='admin' LIMIT 1").fetchone()
+    if not ts:
+        pwd = hashlib.sha256('admin1'.encode()).hexdigest()
+        trial_end = (date.today() + timedelta(days=TRIAL_DAYS)).isoformat()
+        store_id = db.execute(
+            '''INSERT INTO stores (name,email,password,plan,status,trial_ends)
+               VALUES (?,?,?,?,?,?)''',
+            ('Demo Store', 'admin', pwd, 'trial', 'active', trial_end)
+        ).lastrowid
+        for i in range(1, 11):
+            db.execute('INSERT INTO shelves (store_id,shelf_number,monthly_rent) VALUES (?,?,?)',
+                       (store_id, f'S-{i:02d}', 50.00))
 
     db.commit()
     db.close()
