@@ -987,3 +987,63 @@ def admin_suspend_store(store_id):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+
+# ── Forgot / Reset Password (email-based) ─────────────────────────────────────
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    import secrets as _sec, datetime as _dt, json as _json
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        db = get_db()
+        # Check stores table
+        store = db.execute('SELECT * FROM stores WHERE email=?', (email,)).fetchone()
+        if store:
+            token = _sec.token_urlsafe(24)
+            resets_path = os.path.join(DATA_DIR, 'password_resets.json')
+            resets = []
+            try:
+                if os.path.exists(resets_path):
+                    with open(resets_path) as f: resets = _json.load(f)
+            except: pass
+            resets = [r for r in resets if r.get('email') != email]
+            resets.append({
+                'email': email, 'token': token, 'type': 'store',
+                'expires': (_dt.datetime.now() + _dt.timedelta(hours=2)).isoformat()
+            })
+            with open(resets_path, 'w') as f: _json.dump(resets, f, indent=2)
+            flash(f'Reset token generated: {token} — Visit /reset-password/{token} to set your new password.', 'success')
+        else:
+            flash('If that email is registered, a reset token has been generated.', 'info')
+        return redirect(url_for('forgot_password'))
+    return render_template('forgot_password.html')
+
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    import json as _json, datetime as _dt
+    resets_path = os.path.join(DATA_DIR, 'password_resets.json')
+    resets = []
+    try:
+        if os.path.exists(resets_path):
+            with open(resets_path) as f: resets = _json.load(f)
+    except: pass
+    reset = next((r for r in resets if r.get('token') == token), None)
+    if not reset:
+        flash('Invalid or expired reset link.', 'error')
+        return redirect(url_for('store_login'))
+    if _dt.datetime.fromisoformat(reset['expires']) < _dt.datetime.now():
+        flash('Reset link has expired. Request a new one.', 'error')
+        return redirect(url_for('forgot_password'))
+    if request.method == 'POST':
+        new_pw = request.form.get('password', '').strip()
+        if len(new_pw) < 6:
+            flash('Password must be at least 6 characters.', 'error')
+            return render_template('reset_password.html', token=token, email=reset.get('email',''))
+        db = get_db()
+        db.execute('UPDATE stores SET password=? WHERE email=?', (hash_pw(new_pw), reset['email']))
+        db.commit()
+        resets = [r for r in resets if r.get('token') != token]
+        with open(resets_path, 'w') as f: _json.dump(resets, f, indent=2)
+        flash('Password updated! You can now sign in.', 'success')
+        return redirect(url_for('store_login'))
+    return render_template('reset_password.html', token=token, email=reset.get('email',''))
