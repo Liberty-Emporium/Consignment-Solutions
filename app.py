@@ -985,6 +985,9 @@ def admin_suspend_store(store_id):
     flash('Store suspended.', 'success')
     return redirect(url_for('super_admin_dashboard'))
 
+@app.route('/healthz')
+def healthz(): return 'ok'
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
 
