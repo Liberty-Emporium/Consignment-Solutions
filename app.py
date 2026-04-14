@@ -18,6 +18,36 @@ from functools import wraps
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'consignment-solutions-secret-2024')
 
+import time as _rl_time
+from collections import defaultdict as _defaultdict
+_rate_store = _defaultdict(list)
+
+@app.after_request
+def _add_security_headers(response):
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    if 'Content-Security-Policy' not in response.headers:
+        response.headers['Content-Security-Policy'] = "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:;"
+    return response
+
+@app.route('/health', methods=['GET', 'HEAD'])
+def _health_check():
+    import json as _json
+    try:
+        db = get_db()
+        db.execute('SELECT 1').fetchone()
+        db_ok = 'ok'
+    except Exception:
+        db_ok = 'error'
+    status = 'ok' if db_ok == 'ok' else 'degraded'
+    return _json.dumps({'status': status, 'db': db_ok}), (200 if status == 'ok' else 503), {'Content-Type': 'application/json'}
+
+@app.route('/ping')
+def _ping():
+    return 'ok', 200
+
 DATA_DIR = os.environ.get('DATA_DIR', '/data')
 os.makedirs(DATA_DIR, exist_ok=True)
 
