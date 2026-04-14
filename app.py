@@ -20,6 +20,27 @@ app.secret_key = os.environ.get('SECRET_KEY', 'consignment-solutions-secret-2024
 
 import time as _rl_time
 from collections import defaultdict as _defaultdict
+
+import bcrypt as _bcrypt_lib
+
+def _sha256_hash(pw):
+    import hashlib
+    return hashlib.sha256(pw.encode()).hexdigest()
+
+def _is_sha256_hash(h):
+    return isinstance(h, str) and len(h) == 64 and all(c in '0123456789abcdef' for c in h.lower())
+
+def _bcrypt_hash(pw):
+    return _bcrypt_lib.hashpw(pw.encode('utf-8'), _bcrypt_lib.gensalt()).decode('utf-8')
+
+def _bcrypt_verify(pw, stored):
+    if _is_sha256_hash(stored):
+        return _sha256_hash(pw) == stored, True  # valid, needs_upgrade
+    try:
+        return _bcrypt_lib.checkpw(pw.encode('utf-8'), stored.encode('utf-8')), False
+    except Exception:
+        return False, False
+
 _rate_store = _defaultdict(list)
 
 @app.after_request
@@ -243,8 +264,7 @@ init_db()
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
-def hash_pw(pw):
-    return hashlib.sha256(pw.encode()).hexdigest()
+def hash_pw(pw): return _bcrypt_hash(pw)
 
 def current_month():
     return date.today().strftime('%Y-%m')
