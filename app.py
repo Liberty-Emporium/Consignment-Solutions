@@ -74,6 +74,45 @@ def _add_security_headers(response):
         response.headers['Content-Security-Policy'] = "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:;"
     return response
 
+# ── OpenRouter AI (single provider) ──────────────────────────────────────────
+def get_openrouter_key(user_id=None):
+    """Get OpenRouter API key from config or env."""
+    import os
+    return get_config('openrouter_key', os.environ.get('OPENROUTER_API_KEY', ''))
+
+def get_openrouter_model(user_id=None):
+    """Get selected OpenRouter model from config."""
+    return get_config('openrouter_model', 'google/gemini-flash-1.5')
+
+def call_openrouter(messages, user_id=None, max_tokens=1000):
+    """Call OpenRouter API with any model. Returns text string."""
+    import urllib.request as _ur, json as _json
+    key = get_openrouter_key(user_id)
+    if not key:
+        return "AI unavailable — add your OpenRouter API key in Settings ⚙️"
+    model = get_openrouter_model(user_id)
+    try:
+        payload = _json.dumps({
+            'model': model,
+            'messages': messages,
+            'max_tokens': max_tokens
+        }).encode()
+        req = _ur.Request(
+            'https://openrouter.ai/api/v1/chat/completions',
+            data=payload,
+            headers={
+                'Authorization': f'Bearer {key}',
+                'Content-Type': 'application/json',
+                'HTTP-Referer': 'https://libertyemporium.com',
+                'X-Title': 'Liberty App'
+            }
+        )
+        with _ur.urlopen(req, timeout=30) as resp:
+            return _json.loads(resp.read())['choices'][0]['message']['content']
+    except Exception as e:
+        return f"AI error: {e}"
+# ─────────────────────────────────────────────────────────────────────────────
+
 @app.route('/health', methods=['GET', 'HEAD'])
 def _health_check():
     import json as _json
@@ -930,7 +969,10 @@ def settings():
     for f in ['groq_key','qwen_key','square_token','square_webhook_sig']:
         if masked.get(f): masked[f] = masked[f][:8]+'...'
     webhook_url = f"{request.host_url}webhook/square/{sid}"
-    return render_template('settings.html', store=masked, webhook_url=webhook_url)
+    return render_template('settings.html', store=masked, webhook_url=webhook_url,
+        key_set=bool(get_openrouter_key()),
+        current_key=get_openrouter_key(),
+        current_model=get_openrouter_model())
 
 # ─── Vendor Portal ─────────────────────────────────────────────────────────
 
