@@ -1128,7 +1128,29 @@ def forgot_password():
                 'expires': (_dt.datetime.now() + _dt.timedelta(hours=2)).isoformat()
             })
             with open(resets_path, 'w') as f: _json.dump(resets, f, indent=2)
-            flash(f'Reset token generated: {token} — Visit /reset-password/{token} to set your new password.', 'success')
+            reset_url = request.host_url.rstrip('/') + f'/reset-password/{token}'
+            send_email(
+                to=email,
+                subject='Reset Your Password',
+                body=(
+                    f"Hi,
+
+"
+                    f"A password reset was requested for your account.
+
+"
+                    f"Click this link to set a new password (valid for 2 hours):
+"
+                    f"{reset_url}
+
+"
+                    f"If you didn't request this, you can safely ignore this email.
+
+"
+                    f"— Support"
+                )
+            )
+            flash('If that email is registered, a reset link has been sent.', 'info')
         else:
             flash('If that email is registered, a reset token has been generated.', 'info')
         return redirect(url_for('forgot_password'))
