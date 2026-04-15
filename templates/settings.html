@@ -1,29 +1,157 @@
-{% extends 'base.html' %}{% block title %}Settings{% endblock %}{% block content %}
-<div class="ph"><h1>⚙️ Settings</h1></div>
-<div style="max-width:600px;">
-<div class="card"><h3>🏪 Store Info</h3><form method="POST"><input type="hidden" name="form_type" value="store">
-<div class="fg"><label>Store Name</label><input name="store_name" value="{{ store.name }}"></div>
-<div class="fg"><label>Phone</label><input name="phone" value="{{ store.phone or '' }}"></div>
-<button type="submit" class="btn btn-g">Save Store Info</button></form></div>
-
-<div class="card"><h3>🤖 AI Settings</h3><form method="POST"><input type="hidden" name="form_type" value="ai">
-<div class="fg"><label>Active Provider</label><select name="ai_provider">
-<option value="qwen" {% if store.ai_provider=='qwen' %}selected{% endif %}>Qwen (Affordable)</option>
-<option value="groq" {% if store.ai_provider=='groq' %}selected{% endif %}>Groq (Free tier)</option>
-</select></div>
-<div class="fg"><label>Qwen API Key</label><input type="password" name="qwen_key" placeholder="{% if store.qwen_key %}{{ store.qwen_key }}{% else %}Enter Qwen key{% endif %}"><small style="color:#64748b;">dashscope.aliyuncs.com</small></div>
-<div class="fg"><label>Groq API Key</label><input type="password" name="groq_key" placeholder="{% if store.groq_key %}{{ store.groq_key }}{% else %}Enter Groq key{% endif %}"><small style="color:#64748b;">console.groq.com (free)</small></div>
-<button type="submit" class="btn btn-p">Save AI Settings</button></form></div>
-
-<div class="card"><h3>🟦 Square Integration</h3><form method="POST"><input type="hidden" name="form_type" value="square">
-<div class="fg"><label>Environment</label><select name="square_env">
-<option value="sandbox" {% if store.square_env=='sandbox' %}selected{% endif %}>Sandbox (Testing)</option>
-<option value="production" {% if store.square_env=='production' %}selected{% endif %}>Production (Live)</option>
-</select></div>
-<div class="fg"><label>Access Token</label><input type="password" name="square_token" placeholder="{% if store.square_token %}{{ store.square_token }}{% else %}EAAAl...{% endif %}"></div>
-<div class="fg"><label>Location ID</label><input name="square_location" value="{{ store.square_location or '' }}"></div>
-<div class="fg"><label>Webhook Signature Key (optional)</label><input type="password" name="square_webhook_sig" placeholder="For verifying Square webhooks"></div>
-<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:0.75rem;margin-bottom:1rem;font-size:0.8rem;color:#92400e;">
-<strong>Your Webhook URL:</strong> Set this in Square Developer Dashboard:<br><code>{{ webhook_url }}</code></div>
-<button type="submit" class="btn btn-p">Save Square Settings</button></form></div>
-</div>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Settings | Consignment Solutions{% endblock %}
+{% block content %}
+<div class="container py-4" style="max-width:860px;">
+  <h2 style="font-weight:800;letter-spacing:-0.03em;margin-bottom:1.5rem;">⚙️ Settings</h2>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="alert alert-{{ 'success' if cat == 'success' else 'danger' }} alert-dismissible" role="alert">
+        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endwith %}
+  <form method="POST">
+    <div class="card mb-4">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <span style="font-weight:700;font-size:1rem;">🔑 OpenRouter API Key</span>
+        <div class="d-flex gap-2">
+          <a href="https://openrouter.ai/keys" target="_blank" class="btn btn-sm btn-outline-primary">Get Key</a>
+          <a href="https://openrouter.ai/credits" target="_blank" class="btn btn-sm btn-outline-secondary">Billing</a>
+        </div>
+      </div>
+      <div class="card-body">
+        <input type="password" name="openrouter_key" class="form-control" value="{{ current_key or '' }}" placeholder="sk-or-v1-...">
+        <div class="form-text mt-1">One key, every model. <a href="https://openrouter.ai" target="_blank">openrouter.ai</a></div>
+        {% if key_set %}<div class="mt-2"><span class="badge bg-success">✓ Key saved</span></div>{% endif %}
+      </div>
+    </div>
+    <div class="card mb-4">
+      <div class="card-header"><span style="font-weight:700;font-size:1rem;">🤖 Choose Your AI Model</span></div>
+      <div class="card-body">
+        <input type="text" id="modelSearch" class="form-control mb-3" placeholder="🔍 Search models..." oninput="filterModels()">
+        <div id="modelGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.75rem;">
+          <div class="model-card {%if current_model == 'google/gemini-flash-1.5'%}selected{%endif%}" onclick="selectModel('google/gemini-flash-1.5')" data-name="Gemini Flash 1.5 Google ⚡ Fast">
+            <div class="model-badge" style="background:#fef3c7;color:#92400e;">⚡ Fast</div>
+            <div class="model-name">Gemini Flash 1.5</div>
+            <div class="model-meta">Google · $0.075/1M · Best speed/cost</div>
+          </div>
+          <div class="model-card {%if current_model == 'google/gemini-flash-2.0'%}selected{%endif%}" onclick="selectModel('google/gemini-flash-2.0')" data-name="Gemini Flash 2.0 Google ⚡ Fast">
+            <div class="model-badge" style="background:#fef3c7;color:#92400e;">⚡ Fast</div>
+            <div class="model-name">Gemini Flash 2.0</div>
+            <div class="model-meta">Google · $0.10/1M · Latest fast</div>
+          </div>
+          <div class="model-card {%if current_model == 'meta-llama/llama-3.3-70b-instruct:free'%}selected{%endif%}" onclick="selectModel('meta-llama/llama-3.3-70b-instruct:free')" data-name="Llama 3.3 70B Meta 🆓 Free">
+            <div class="model-badge" style="background:#d1fae5;color:#065f46;">🆓 Free</div>
+            <div class="model-name">Llama 3.3 70B</div>
+            <div class="model-meta">Meta · FREE · Powerful & free</div>
+          </div>
+          <div class="model-card {%if current_model == 'meta-llama/llama-3.1-8b-instruct:free'%}selected{%endif%}" onclick="selectModel('meta-llama/llama-3.1-8b-instruct:free')" data-name="Llama 3.1 8B Meta 🆓 Free">
+            <div class="model-badge" style="background:#d1fae5;color:#065f46;">🆓 Free</div>
+            <div class="model-name">Llama 3.1 8B</div>
+            <div class="model-meta">Meta · FREE · Lightweight</div>
+          </div>
+          <div class="model-card {%if current_model == 'openai/gpt-4o-mini'%}selected{%endif%}" onclick="selectModel('openai/gpt-4o-mini')" data-name="GPT-4o Mini OpenAI ⚡ Fast">
+            <div class="model-badge" style="background:#fef3c7;color:#92400e;">⚡ Fast</div>
+            <div class="model-name">GPT-4o Mini</div>
+            <div class="model-meta">OpenAI · $0.15/1M · Smart & cheap</div>
+          </div>
+          <div class="model-card {%if current_model == 'openai/gpt-4o'%}selected{%endif%}" onclick="selectModel('openai/gpt-4o')" data-name="GPT-4o OpenAI 🧠 Powerful">
+            <div class="model-badge" style="background:#dbeafe;color:#1e40af;">🧠 Powerful</div>
+            <div class="model-name">GPT-4o</div>
+            <div class="model-meta">OpenAI · $2.50/1M · Most reliable</div>
+          </div>
+          <div class="model-card {%if current_model == 'anthropic/claude-3.5-sonnet'%}selected{%endif%}" onclick="selectModel('anthropic/claude-3.5-sonnet')" data-name="Claude 3.5 Sonnet Anthropic 🧠 Powerful">
+            <div class="model-badge" style="background:#dbeafe;color:#1e40af;">🧠 Powerful</div>
+            <div class="model-name">Claude 3.5 Sonnet</div>
+            <div class="model-meta">Anthropic · $3/1M · Best reasoning</div>
+          </div>
+          <div class="model-card {%if current_model == 'anthropic/claude-3.5-haiku'%}selected{%endif%}" onclick="selectModel('anthropic/claude-3.5-haiku')" data-name="Claude 3.5 Haiku Anthropic ⚡ Fast">
+            <div class="model-badge" style="background:#fef3c7;color:#92400e;">⚡ Fast</div>
+            <div class="model-name">Claude 3.5 Haiku</div>
+            <div class="model-meta">Anthropic · $0.80/1M · Fast Claude</div>
+          </div>
+          <div class="model-card {%if current_model == 'anthropic/claude-opus-4'%}selected{%endif%}" onclick="selectModel('anthropic/claude-opus-4')" data-name="Claude Opus 4 Anthropic 👑 Best">
+            <div class="model-badge" style="background:#dbeafe;color:#1e40af;">👑 Best</div>
+            <div class="model-name">Claude Opus 4</div>
+            <div class="model-meta">Anthropic · $15/1M · Most capable</div>
+          </div>
+          <div class="model-card {%if current_model == 'google/gemini-pro-1.5'%}selected{%endif%}" onclick="selectModel('google/gemini-pro-1.5')" data-name="Gemini Pro 1.5 Google 🧠 Powerful">
+            <div class="model-badge" style="background:#dbeafe;color:#1e40af;">🧠 Powerful</div>
+            <div class="model-name">Gemini Pro 1.5</div>
+            <div class="model-meta">Google · $1.25/1M · Long context</div>
+          </div>
+          <div class="model-card {%if current_model == 'google/gemini-2.0-flash-thinking-exp:free'%}selected{%endif%}" onclick="selectModel('google/gemini-2.0-flash-thinking-exp:free')" data-name="Gemini 2.0 Thinking Google 🆓 Free">
+            <div class="model-badge" style="background:#d1fae5;color:#065f46;">🆓 Free</div>
+            <div class="model-name">Gemini 2.0 Thinking</div>
+            <div class="model-meta">Google · FREE · Reasoning</div>
+          </div>
+          <div class="model-card {%if current_model == 'x-ai/grok-3-mini-beta'%}selected{%endif%}" onclick="selectModel('x-ai/grok-3-mini-beta')" data-name="Grok 3 Mini xAI 🌟 xAI">
+            <div class="model-badge" style="background:#f3f4f6;color:#374151;">🌟 xAI</div>
+            <div class="model-name">Grok 3 Mini</div>
+            <div class="model-meta">xAI · $0.30/1M · Real-time web</div>
+          </div>
+          <div class="model-card {%if current_model == 'x-ai/grok-3-beta'%}selected{%endif%}" onclick="selectModel('x-ai/grok-3-beta')" data-name="Grok 3 xAI 🌟 xAI">
+            <div class="model-badge" style="background:#f3f4f6;color:#374151;">🌟 xAI</div>
+            <div class="model-name">Grok 3</div>
+            <div class="model-meta">xAI · $3/1M · Flagship</div>
+          </div>
+          <div class="model-card {%if current_model == 'deepseek/deepseek-r1:free'%}selected{%endif%}" onclick="selectModel('deepseek/deepseek-r1:free')" data-name="DeepSeek R1 DeepSeek 🆓 Free">
+            <div class="model-badge" style="background:#d1fae5;color:#065f46;">🆓 Free</div>
+            <div class="model-name">DeepSeek R1</div>
+            <div class="model-meta">DeepSeek · FREE · Best free coder</div>
+          </div>
+          <div class="model-card {%if current_model == 'deepseek/deepseek-chat'%}selected{%endif%}" onclick="selectModel('deepseek/deepseek-chat')" data-name="DeepSeek V3 DeepSeek 💻 Coding">
+            <div class="model-badge" style="background:#ede9fe;color:#5b21b6;">💻 Coding</div>
+            <div class="model-name">DeepSeek V3</div>
+            <div class="model-meta">DeepSeek · $0.14/1M · Top coder</div>
+          </div>
+          <div class="model-card {%if current_model == 'meta-llama/llama-3.1-70b-instruct'%}selected{%endif%}" onclick="selectModel('meta-llama/llama-3.1-70b-instruct')" data-name="Llama 3.1 70B Meta 🧠 Powerful">
+            <div class="model-badge" style="background:#dbeafe;color:#1e40af;">🧠 Powerful</div>
+            <div class="model-name">Llama 3.1 70B</div>
+            <div class="model-meta">Meta · $0.59/1M · Open source</div>
+          </div>
+          <div class="model-card {%if current_model == 'mistralai/mistral-7b-instruct:free'%}selected{%endif%}" onclick="selectModel('mistralai/mistral-7b-instruct:free')" data-name="Mistral 7B Mistral 🆓 Free">
+            <div class="model-badge" style="background:#d1fae5;color:#065f46;">🆓 Free</div>
+            <div class="model-name">Mistral 7B</div>
+            <div class="model-meta">Mistral · FREE · European AI</div>
+          </div>
+          <div class="model-card {%if current_model == 'mistralai/mistral-large'%}selected{%endif%}" onclick="selectModel('mistralai/mistral-large')" data-name="Mistral Large Mistral 🧠 Powerful">
+            <div class="model-badge" style="background:#dbeafe;color:#1e40af;">🧠 Powerful</div>
+            <div class="model-name">Mistral Large</div>
+            <div class="model-meta">Mistral · $2/1M · European flagship</div>
+          </div>
+          <div class="model-card {%if current_model == 'qwen/qwen-2.5-72b-instruct'%}selected{%endif%}" onclick="selectModel('qwen/qwen-2.5-72b-instruct')" data-name="Qwen 2.5 72B Alibaba ⚡ Fast">
+            <div class="model-badge" style="background:#fef3c7;color:#92400e;">⚡ Fast</div>
+            <div class="model-name">Qwen 2.5 72B</div>
+            <div class="model-meta">Alibaba · $0.23/1M · Great value</div>
+          </div>
+          <div class="model-card {%if current_model == 'openai/o1-mini'%}selected{%endif%}" onclick="selectModel('openai/o1-mini')" data-name="o1 Mini OpenAI 🧠 Reasoning">
+            <div class="model-badge" style="background:#dbeafe;color:#1e40af;">🧠 Reasoning</div>
+            <div class="model-name">o1 Mini</div>
+            <div class="model-meta">OpenAI · $1.10/1M · Chain-of-thought</div>
+          </div>
+        </div>
+        <input type="hidden" name="openrouter_model" id="selectedModel" value="{{ current_model or 'google/gemini-flash-1.5' }}">
+        <div class="mt-3 p-3 rounded" style="background:#f1f5f9;font-size:0.875rem;">
+          Selected: <strong id="selectedModelDisplay">{{ current_model or 'google/gemini-flash-1.5' }}</strong>
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg">💾 Save Settings</button>
+  </form>
+</div>
+<style>
+.model-card{border:2px solid #e2e8f0;border-radius:12px;padding:1rem;cursor:pointer;transition:all 0.15s ease;background:white;position:relative;}
+.model-card:hover{border-color:#6366f1;box-shadow:0 4px 12px rgba(99,102,241,.15);transform:translateY(-1px);}
+.model-card.selected{border-color:#6366f1;background:#eef2ff;box-shadow:0 0 0 2px rgba(99,102,241,.3);}
+.model-card.selected::after{content:'✓';position:absolute;top:8px;right:10px;color:#6366f1;font-weight:800;}
+.model-badge{font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
+.model-name{font-weight:700;font-size:0.95rem;color:#0f172a;margin-bottom:3px;}
+.model-meta{font-size:0.75rem;color:#64748b;}
+.model-card.hidden{display:none;}
+</style>
+<script>
+function selectModel(id){document.querySelectorAll('.model-card').forEach(c=>c.classList.remove('selected'));event.currentTarget.classList.add('selected');document.getElementById('selectedModel').value=id;document.getElementById('selectedModelDisplay').textContent=id;}
+function filterModels(){const q=document.getElementById('modelSearch').value.toLowerCase();document.querySelectorAll('.model-card').forEach(card=>{const t=(card.dataset.name||'')+card.innerText;card.classList.toggle('hidden',!t.toLowerCase().includes(q));});}
+</script>
+{% endblock %}
