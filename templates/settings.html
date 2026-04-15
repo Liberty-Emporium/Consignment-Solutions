@@ -151,7 +151,7 @@
 .model-card.hidden{display:none;}
 </style>
 <script>
-function selectModel(id){document.querySelectorAll('.model-card').forEach(c=>c.classList.remove('selected'));event.currentTarget.classList.add('selected');document.getElementById('selectedModel').value=id;document.getElementById('selectedModelDisplay').textContent=id;}
-function filterModels(){const q=document.getElementById('modelSearch').value.toLowerCase();document.querySelectorAll('.model-card').forEach(card=>{const t=(card.dataset.name||'')+card.innerText;card.classList.toggle('hidden',!t.toLowerCase().includes(q));});}
+{% raw %}function selectModel(id){document.querySelectorAll('.model-card').forEach(c=>c.classList.remove('selected'));event.currentTarget.classList.add('selected');document.getElementById('selectedModel').value=id;document.getElementById('selectedModelDisplay').textContent=id;}
+function filterModels(){const q=document.getElementById('modelSearch').value.toLowerCase();document.querySelectorAll('.model-card').forEach(card=>{const t=(card.dataset.name||'')+card.innerText;card.classList.toggle('hidden',!t.toLowerCase().includes(q));});}{% endraw %}
 </script>
 {% endblock %}
