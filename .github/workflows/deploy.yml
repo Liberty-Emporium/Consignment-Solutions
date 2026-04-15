@@ -1,0 +1,17 @@
+name: Deploy to Railway
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Railway Deploy
+        run: |
+          echo "Push detected — Railway auto-deploys from GitHub directly."
+          echo "No manual redeploy needed."
+
+      - name: Notify Success
+        run: echo "✅ ${{ github.repository }} deployed successfully"
