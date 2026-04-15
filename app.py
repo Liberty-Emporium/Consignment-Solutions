@@ -1133,21 +1133,12 @@ def forgot_password():
                 to=email,
                 subject='Reset Your Password',
                 body=(
-                    f"Hi,
-
-"
-                    f"A password reset was requested for your account.
-
-"
-                    f"Click this link to set a new password (valid for 2 hours):
-"
-                    f"{reset_url}
-
-"
-                    f"If you didn't request this, you can safely ignore this email.
-
-"
-                    f"— Support"
+                    "Hi,\n\n"
+                    "A password reset was requested for your account.\n\n"
+                    "Click this link to set a new password (valid for 2 hours):\n"
+                    + reset_url +
+                    "\n\nIf you didn't request this, you can safely ignore this email.\n\n"
+                    "-- Support"
                 )
             )
             flash('If that email is registered, a reset link has been sent.', 'info')
