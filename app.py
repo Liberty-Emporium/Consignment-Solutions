@@ -1102,6 +1102,41 @@ def admin_suspend_store(store_id):
 @app.route('/healthz')
 def healthz(): return 'ok'
 
+
+# ── Admin-only API token UI routes ───────────────────────────────────────────
+@app.route('/api/token/ui', methods=['POST'])
+def api_token_ui_generate():
+    if not session.get('super_admin_id'):
+        return jsonify({'error': 'Admin only'}), 403
+    import secrets as _s, hashlib as _h, datetime as _dt
+    user_id = session.get('user_id') or session.get('super_admin_id') or 1
+    label = 'ui-generated'
+    raw_token = _s.token_urlsafe(48)
+    token_hash = _h.sha256(raw_token.encode()).hexdigest()
+    expires_at = (_dt.datetime.utcnow() + _dt.timedelta(days=365)).isoformat()
+    conn = get_db()
+    try:
+        conn.execute('CREATE TABLE IF NOT EXISTS api_tokens (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, token_hash TEXT UNIQUE, label TEXT, expires_at TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)')
+        conn.execute('DELETE FROM api_tokens WHERE user_id=? AND label=?', (user_id, label))
+        conn.execute('INSERT INTO api_tokens (user_id,token_hash,label,expires_at) VALUES (?,?,?,?)', (user_id, token_hash, label, expires_at))
+        conn.commit()
+    finally:
+        conn.close()
+    return jsonify({'success':True,'api_token':raw_token,'expires_at':expires_at})
+
+@app.route('/api/token/ui', methods=['DELETE'])
+def api_token_ui_revoke():
+    if not session.get('super_admin_id'):
+        return jsonify({'error': 'Admin only'}), 403
+    user_id = session.get('user_id') or session.get('super_admin_id') or 1
+    conn = get_db()
+    try:
+        conn.execute('DELETE FROM api_tokens WHERE user_id=? AND label=?', (user_id, 'ui-generated'))
+        conn.commit()
+    finally:
+        conn.close()
+    return jsonify({'success':True})
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
 
