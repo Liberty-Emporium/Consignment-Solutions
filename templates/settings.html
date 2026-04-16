@@ -154,4 +154,46 @@
 {% raw %}function selectModel(id){document.querySelectorAll('.model-card').forEach(c=>c.classList.remove('selected'));event.currentTarget.classList.add('selected');document.getElementById('selectedModel').value=id;document.getElementById('selectedModelDisplay').textContent=id;}
 function filterModels(){const q=document.getElementById('modelSearch').value.toLowerCase();document.querySelectorAll('.model-card').forEach(card=>{const t=(card.dataset.name||'')+card.innerText;card.classList.toggle('hidden',!t.toLowerCase().includes(q));});}{% endraw %}
 </script>
+
+  {% if session.get('super_admin_id') %}
+  <div class="card" style="margin-top:24px;padding:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+      <strong>&#x1F916; API Access Token</strong>
+      <span style="font-size:0.78rem;opacity:.6;">Admin only &mdash; for programmatic access</span>
+    </div>
+    <div id="apiTokenBox" style="display:none;margin-bottom:14px;">
+      <label style="font-size:0.82rem;opacity:.7;display:block;margin-bottom:6px;">Your API Token (shown once &mdash; copy it now!)</label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="text" id="apiTokenValue" readonly style="font-family:monospace;font-size:0.82rem;flex:1;cursor:text;">
+        <button type="button" onclick="copyApiToken()" class="btn btn-outline btn-sm">&#x1F4CB; Copy</button>
+      </div>
+      <p style="margin-top:8px;font-size:0.78rem;color:#fbbf24;">&#x26A0;&#xFE0F; Save this token &mdash; shown once only. Use as: <code>Authorization: Bearer TOKEN</code></p>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button type="button" onclick="generateApiToken()" class="btn btn-primary btn-sm" id="genApiBtn">&#x26A1; Generate Token</button>
+      <button type="button" onclick="revokeApiToken()" class="btn btn-outline btn-sm" style="color:#f87171;border-color:#f87171;">&#x1F5D1;&#xFE0F; Revoke</button>
+    </div>
+  </div>
+  {% endif %}
+<script>
+async function generateApiToken(){
+  const btn=document.getElementById('genApiBtn');btn.disabled=true;btn.textContent='Generating...';
+  try{const res=await fetch('/api/token/ui',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'}});
+  const d=await res.json();
+  if(d.api_token){document.getElementById('apiTokenValue').value=d.api_token;document.getElementById('apiTokenBox').style.display='block';btn.textContent='✓ Generated';}
+  else{alert(d.error||'Failed');btn.textContent='⚡ Generate Token';}}catch(e){alert(e.message);btn.textContent='⚡ Generate Token';}
+  btn.disabled=false;
+}
+async function revokeApiToken(){
+  if(!confirm('Revoke token?'))return;
+  const d=await(await fetch('/api/token/ui',{method:'DELETE',credentials:'same-origin',headers:{'Content-Type':'application/json'}})).json();
+  if(d.success){document.getElementById('apiTokenBox').style.display='none';alert('✅ Revoked.');}
+}
+function copyApiToken(){
+  navigator.clipboard.writeText(document.getElementById('apiTokenValue').value).then(()=>{
+    const b=event.target;b.textContent='✅ Copied!';setTimeout(()=>b.textContent='📋 Copy',2000);
+  });
+}
+</script>
+
 {% endblock %}
