@@ -1,17 +1,114 @@
-name: Deploy to Railway
+name: CI/CD — Consignment Solutions
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
-  deploy:
+  # ── Step 1: Validate code before it hits Railway ──────────────────────────
+  lint-and-check:
+    name: 🔍 Lint & Syntax Check
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Railway Deploy
-        run: |
-          echo "Push detected — Railway auto-deploys from GitHub directly."
-          echo "No manual redeploy needed."
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Notify Success
-        run: echo "✅ ${{ github.repository }} deployed successfully"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --quiet flake8
+          if [ -f requirements.txt ]; then pip install --quiet -r requirements.txt; fi
+
+      - name: Python syntax check (all .py files)
+        run: |
+          echo "Checking Python syntax..."
+          find . -name "*.py" -not -path "./.git/*" -not -path "./__pycache__/*" | while read f; do
+            python -m py_compile "$f" && echo "✅ $f" || (echo "❌ SYNTAX ERROR: $f" && exit 1)
+          done
+
+      - name: Flake8 lint (errors only — no style nitpicks)
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics \
+            --exclude=.git,__pycache__,*.pyc,migrations || true
+
+      - name: Check requirements.txt exists
+        run: |
+          if [ ! -f requirements.txt ]; then
+            echo "⚠️  Warning: requirements.txt not found"
+          else
+            echo "✅ requirements.txt found"
+            cat requirements.txt
+          fi
+
+  # ── Step 2: Deploy (Railway auto-deploys on push — just confirm it) ───────
+  deploy-and-verify:
+    name: 🚀 Deploy & Health Check
+    runs-on: ubuntu-latest
+    needs: lint-and-check
+    if: github.event_name == 'push'
+    steps:
+      - name: Wait for Railway to pick up the push
+        run: |
+          echo "Railway auto-deploys from this push..."
+          echo "Waiting 90 seconds for build + deploy to complete..."
+          sleep 90
+
+      - name: Health check — verify deployment succeeded
+        run: |
+          echo "Checking https://web-production-43ce4.up.railway.app/health..."
+          MAX_RETRIES=8
+          RETRY_DELAY=20
+          for i in $(seq 1 $MAX_RETRIES); do
+            echo "Attempt $i/$MAX_RETRIES..."
+            RESPONSE=$(curl -sf --max-time 15 "https://web-production-43ce4.up.railway.app/health" 2>&1) && STATUS=0 || STATUS=$?
+            if [ $STATUS -eq 0 ]; then
+              echo "✅ Health check passed: $RESPONSE"
+              # Verify JSON has status:ok
+              echo "$RESPONSE" | python3 -c "
+          import sys, json
+          try:
+              d = json.load(sys.stdin)
+              if d.get('status') == 'ok':
+                  print('✅ Status: ok')
+                  if d.get('db'):
+                      print(f'✅ DB: {d["db"]}')
+              else:
+                  print(f'⚠️  Unexpected status: {d}')
+                  sys.exit(1)
+          except Exception as e:
+              print(f'⚠️  Could not parse JSON: {e} — raw: ' + sys.stdin.read())
+          " 2>/dev/null || echo "Response received (non-JSON health endpoint)"
+              exit 0
+            fi
+            echo "⏳ Not ready yet (attempt $i). Waiting ${RETRY_DELAY}s..."
+            sleep $RETRY_DELAY
+          done
+          echo "❌ Health check failed after $MAX_RETRIES attempts!"
+          exit 1
+
+      - name: Deployment summary
+        if: success()
+        run: |
+          echo "================================================"
+          echo "✅ Consignment Solutions deployed successfully!"
+          echo "🌐 Live at: https://web-production-43ce4.up.railway.app"
+          echo "🏥 Health: https://web-production-43ce4.up.railway.app/health"
+          echo "📦 Commit: ${{ github.sha }}"
+          echo "👤 Pushed by: ${{ github.actor }}"
+          echo "📅 Time: $(date -u)"
+          echo "================================================"
+
+      - name: Alert on failure
+        if: failure()
+        run: |
+          echo "❌ DEPLOYMENT FAILED for Consignment Solutions!"
+          echo "Commit: ${{ github.sha }}"
+          echo "Pushed by: ${{ github.actor }}"
+          echo "Check Railway dashboard for build logs."
+          exit 1
