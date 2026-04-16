@@ -133,5 +133,153 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#f59e0b;box-sh
 {% endwith %}
 {% block content %}{% endblock %}
 </div>
+
+<!-- ── Echo i18n: 8-language support ── -->
+<style>
+#lang-switcher { position:fixed; bottom:80px; right:1.5rem; z-index:9990; }
+#lang-btn { background:#1e293b; border:1px solid #334155; color:#e2e8f0; padding:6px 12px; border-radius:8px; cursor:pointer; font-size:0.82rem; font-weight:700; display:flex; align-items:center; gap:5px; box-shadow:0 2px 10px rgba(0,0,0,0.4); font-family:inherit; }
+#lang-btn:hover { background:#334155; }
+#lang-menu { display:none; position:absolute; bottom:110%; right:0; background:#1e293b; border:1px solid #334155; border-radius:10px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,0.5); min-width:150px; }
+.lang-item { display:block; width:100%; text-align:left; padding:9px 15px; background:none; border:none; color:#e2e8f0; cursor:pointer; font-size:0.83rem; font-family:inherit; transition:background 0.1s; }
+.lang-item:hover { background:#334155; }
+.lang-item.active { color:#6366f1; font-weight:700; }
+[dir="rtl"] #lang-menu { right:auto; left:0; }
+[dir="rtl"] #lang-switcher { right:auto; left:1.5rem; }
+</style>
+<script>
+(function(){
+"use strict";
+var LANGS={en:{name:'English',flag:'🇺🇸'},es:{name:'Español',flag:'🇪🇸'},fr:{name:'Français',flag:'🇫🇷'},pt:{name:'Português',flag:'🇧🇷'},de:{name:'Deutsch',flag:'🇩🇪'},zh:{name:'中文',flag:'🇨🇳'},ja:{name:'日本語',flag:'🇯🇵'},ar:{name:'العربية',flag:'🇸🇦'}};
+var T={
+'Dashboard':             {es:'Panel',fr:'Tableau de bord',pt:'Painel',de:'Dashboard',zh:'仪表板',ja:'ダッシュボード',ar:'لوحة التحكم'},
+'Settings':              {es:'Configuración',fr:'Paramètres',pt:'Configurações',de:'Einstellungen',zh:'设置',ja:'設定',ar:'الإعدادات'},
+'Logout':                {es:'Cerrar sesión',fr:'Déconnexion',pt:'Sair',de:'Abmelden',zh:'退出',ja:'ログアウト',ar:'تسجيل الخروج'},
+'Login':                 {es:'Iniciar sesión',fr:'Connexion',pt:'Entrar',de:'Anmelden',zh:'登录',ja:'ログイン',ar:'تسجيل الدخول'},
+'Sign Up':               {es:'Registrarse',fr:"S'inscrire",pt:'Cadastrar',de:'Registrieren',zh:'注册',ja:'登録',ar:'إنشاء حساب'},
+'Start Free Trial':      {es:'Prueba Gratis',fr:'Essai Gratuit',pt:'Teste Grátis',de:'Kostenlos testen',zh:'免费试用',ja:'無料トライアル',ar:'تجربة مجانية'},
+'+ Add Key':             {es:'+ Añadir Clave',fr:'+ Ajouter une clé',pt:'+ Adicionar Chave',de:'+ Schlüssel hinzufügen',zh:'+ 添加密钥',ja:'+ キー追加',ar:'+ إضافة مفتاح'},
+'Prices':                {es:'Precios',fr:'Prix',pt:'Preços',de:'Preise',zh:'价格',ja:'価格',ar:'الأسعار'},
+'AI Bids':               {es:'Ofertas IA',fr:'Offres IA',pt:'Lances IA',de:'KI-Angebote',zh:'AI投标',ja:'AI入札',ar:'عروض AI'},
+'AI Advisor':            {es:'Asesor IA',fr:'Conseiller IA',pt:'Conselheiro IA',de:'KI-Berater',zh:'AI顾问',ja:'AIアドバイザー',ar:'مستشار AI'},
+'Locations':             {es:'Ubicaciones',fr:'Emplacements',pt:'Localizações',de:'Standorte',zh:'位置',ja:'場所',ar:'المواقع'},
+'New Products':          {es:'Nuevos Productos',fr:'Nouveaux Produits',pt:'Novos Produtos',de:'Neue Produkte',zh:'新产品',ja:'新製品',ar:'منتجات جديدة'},
+'My Bids':               {es:'Mis Ofertas',fr:'Mes Offres',pt:'Meus Lances',de:'Meine Angebote',zh:'我的投标',ja:'マイ入札',ar:'عروضي'},
+'AI CEO':                {es:'CEO IA',fr:'PDG IA',pt:'CEO IA',de:'KI-CEO',zh:'AI总裁',ja:'AI CEO',ar:'الرئيس التنفيذي AI'},
+'Overseer':              {es:'Supervisor',fr:'Superviseur',pt:'Supervisor',de:'Aufseher',zh:'监督员',ja:'監督者',ar:'المشرف'},
+'Exit Client View':      {es:'Salir Vista Cliente',fr:'Quitter vue client',pt:'Sair Vista Cliente',de:'Kundensicht verlassen',zh:'退出客户视图',ja:'クライアントビュー終了',ar:'الخروج من عرض العميل'},
+'Orders':                {es:'Pedidos',fr:'Commandes',pt:'Pedidos',de:'Bestellungen',zh:'订单',ja:'注文',ar:'الطلبات'},
+'Products':              {es:'Productos',fr:'Produits',pt:'Produtos',de:'Produkte',zh:'产品',ja:'製品',ar:'المنتجات'},
+'Suppliers':             {es:'Proveedores',fr:'Fournisseurs',pt:'Fornecedores',de:'Lieferanten',zh:'供应商',ja:'サプライヤー',ar:'الموردين'},
+'Customers':             {es:'Clientes',fr:'Clients',pt:'Clientes',de:'Kunden',zh:'客户',ja:'顧客',ar:'العملاء'},
+'Analytics':             {es:'Análisis',fr:'Analyses',pt:'Análises',de:'Analysen',zh:'分析',ja:'分析',ar:'التحليلات'},
+'AI Sourcer':            {es:'Buscador IA',fr:'Sourceur IA',pt:'Buscador IA',de:'KI-Einkäufer',zh:'AI采购',ja:'AIソーサー',ar:'مورد AI'},
+'Research':              {es:'Investigación',fr:'Recherche',pt:'Pesquisa',de:'Recherche',zh:'研究',ja:'調査',ar:'البحث'},
+'Marketing':             {es:'Marketing',fr:'Marketing',pt:'Marketing',de:'Marketing',zh:'营销',ja:'マーケティング',ar:'التسويق'},
+'Alerts':                {es:'Alertas',fr:'Alertes',pt:'Alertas',de:'Warnungen',zh:'提醒',ja:'アラート',ar:'التنبيهات'},
+'Profit Calc':           {es:'Calc. Ganancia',fr:'Calc. Profit',pt:'Calc. Lucro',de:'Gewinnrechner',zh:'利润计算',ja:'利益計算',ar:'حاسبة الربح'},
+'Shipping':              {es:'Envíos',fr:'Livraison',pt:'Envio',de:'Versand',zh:'运输',ja:'配送',ar:'الشحن'},
+'Add Product':           {es:'Añadir Producto',fr:'Ajouter un produit',pt:'Adicionar Produto',de:'Produkt hinzufügen',zh:'添加产品',ja:'製品追加',ar:'إضافة منتج'},
+'Picture Ads':           {es:'Anuncios con Fotos',fr:'Pubs Photo',pt:'Anúncios com Fotos',de:'Bildanzeigen',zh:'图片广告',ja:'写真広告',ar:'إعلانات صور'},
+'Ad Vault':              {es:'Bóveda de Anuncios',fr:'Coffre des pubs',pt:'Cofre de Anúncios',de:'Anzeigen-Tresor',zh:'广告库',ja:'広告ボールト',ar:'خزنة الإعلانات'},
+'Listings':              {es:'Listados',fr:'Annonces',pt:'Listagens',de:'Angebote',zh:'列表',ja:'リスト',ar:'القوائم'},
+'Sale':                  {es:'Venta',fr:'Vente',pt:'Venda',de:'Verkauf',zh:'销售',ja:'セール',ar:'البيع'},
+'Vendors':               {es:'Vendedores',fr:'Vendeurs',pt:'Vendedores',de:'Anbieter',zh:'供应商',ja:'ベンダー',ar:'البائعون'},
+'Shelves':               {es:'Estantes',fr:'Rayons',pt:'Prateleiras',de:'Regale',zh:'货架',ja:'棚',ar:'الرفوف'},
+'Items':                 {es:'Artículos',fr:'Articles',pt:'Itens',de:'Artikel',zh:'物品',ja:'アイテム',ar:'العناصر'},
+'Sales':                 {es:'Ventas',fr:'Ventes',pt:'Vendas',de:'Verkäufe',zh:'销售',ja:'売上',ar:'المبيعات'},
+'Settlements':           {es:'Liquidaciones',fr:'Règlements',pt:'Liquidações',de:'Abrechnungen',zh:'结算',ja:'精算',ar:'التسويات'},
+'AI Assistant':          {es:'Asistente IA',fr:'Assistant IA',pt:'Assistente IA',de:'KI-Assistent',zh:'AI助手',ja:'AIアシスタント',ar:'مساعد AI'},
+'Find a Vet':            {es:'Buscar Veterinario',fr:'Trouver un vétérinaire',pt:'Encontrar Veterinário',de:'Tierarzt finden',zh:'查找兽医',ja:'獣医を探す',ar:'ابحث عن طبيب بيطري'},
+'Back to My Pets':       {es:'Volver a Mis Mascotas',fr:'Retour à mes animaux',pt:'Voltar aos Meus Pets',de:'Zurück zu Meinen Tieren',zh:'返回我的宠物',ja:'ペットに戻る',ar:'العودة إلى حيواناتي'},
+};
+
+var SUPPORTED=['en','es','fr','pt','de','zh','ja','ar'];
+
+function detectLang(){
+  var saved=localStorage.getItem('echo_lang');
+  if(saved&&SUPPORTED.includes(saved))return saved;
+  var nav=(navigator.language||navigator.userLanguage||'en').slice(0,2).toLowerCase();
+  return SUPPORTED.includes(nav)?nav:'en';
+}
+
+function translateTextNode(node,lang){
+  var orig=node.textContent;
+  var trimmed=orig.trim();
+  if(!trimmed)return;
+  // try exact match
+  if(T[trimmed]&&T[trimmed][lang]){
+    node.textContent=orig.replace(trimmed,T[trimmed][lang]);
+    return;
+  }
+  // try stripping icon prefix (e.g. "📦 Items")
+  var noIcon=trimmed.replace(/^[\u{1F000}-\u{1FFFF}\u2600-\u27BF\uFE0F\s]+/u,'').trim();
+  if(noIcon&&T[noIcon]&&T[noIcon][lang]){
+    node.textContent=orig.replace(noIcon,T[noIcon][lang]);
+  }
+}
+
+function translateEl(el,lang){
+  if(!el)return;
+  el.childNodes.forEach(function(n){
+    if(n.nodeType===3){translateTextNode(n,lang);}
+    else if(n.nodeType===1&&!['SCRIPT','STYLE','INPUT','TEXTAREA'].includes(n.tagName)){
+      translateEl(n,lang);
+    }
+  });
+}
+
+function applyLang(lang){
+  if(lang==='en')return;
+  var zones=['nav','header','.sidebar','.sidebar-content','.nav-links','.nav-top','.nav-user'];
+  zones.forEach(function(sel){
+    document.querySelectorAll(sel).forEach(function(el){translateEl(el,lang);});
+  });
+  if(lang==='ar'){
+    document.documentElement.setAttribute('dir','rtl');
+    document.documentElement.setAttribute('lang','ar');
+  } else {
+    document.documentElement.setAttribute('dir','ltr');
+    document.documentElement.setAttribute('lang',lang);
+  }
+}
+
+function buildSwitcher(){
+  var lang=detectLang();
+  var wrap=document.createElement('div');
+  wrap.id='lang-switcher';
+
+  var btn=document.createElement('button');
+  btn.id='lang-btn';
+  btn.innerHTML='🌐 '+lang.toUpperCase()+' ▾';
+
+  var menu=document.createElement('div');
+  menu.id='lang-menu';
+
+  SUPPORTED.forEach(function(code){
+    var info=LANGS[code];
+    var item=document.createElement('button');
+    item.className='lang-item'+(code===lang?' active':'');
+    item.textContent=info.flag+' '+info.name;
+    item.onclick=function(){localStorage.setItem('echo_lang',code);location.reload();};
+    menu.appendChild(item);
+  });
+
+  btn.onclick=function(e){e.stopPropagation();menu.style.display=menu.style.display==='block'?'none':'block';};
+  document.addEventListener('click',function(){menu.style.display='none';});
+
+  wrap.appendChild(btn);
+  wrap.appendChild(menu);
+  document.body.appendChild(wrap);
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  var lang=detectLang();
+  applyLang(lang);
+  buildSwitcher();
+});
+})();
+</script>
+<!-- ── end i18n ── -->
+
 </body>
 </html>
