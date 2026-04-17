@@ -652,6 +652,9 @@ def super_admin_required(f):
         return f(*args, **kwargs)
     return decorated
 
+# Alias: login_required maps to super_admin_required for admin-only routes
+login_required = super_admin_required
+
 # ─── Public Routes ──────────────────────────────────────────────────────
 
 @app.route('/')

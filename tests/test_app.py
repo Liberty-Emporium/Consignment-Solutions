@@ -1,13 +1,9 @@
 """
 Tests for Consignment Solutions
 
-⚠️  BUG FOUND: app.py uses @login_required decorator at ~line 1396 but this
-function is never defined in the codebase (only store_login_required and
-vendor_login_required exist). This causes a NameError on import.
-
-FIX: Add `login_required = store_login_required` after line 638 in app.py.
-
-The conftest.py patches builtins so tests can still run.
+Fixed 2026-04-17: @login_required was used at line ~1396 but never defined.
+Fix applied: `login_required = super_admin_required` alias added in app.py.
+conftest.py still in place for safety.
 """
 import os
 import sys
@@ -33,20 +29,15 @@ def client(tmp_path):
         yield c
 
 
-# ── Bug documentation ─────────────────────────────────────────────────────────
+# ── Fix verification ──────────────────────────────────────────────────────────
 
-def test_known_bug_login_required_undefined():
+def test_login_required_is_now_defined():
     """
-    Confirms the known bug: @login_required is used but not defined.
-    This test should be removed once the bug is fixed in app.py.
-    Fix: add `login_required = store_login_required` after line 638.
+    Verifies fix for: @login_required was undefined (NameError on import).
+    Fixed 2026-04-17: aliased to super_admin_required in app.py.
     """
-    import inspect
-    src = inspect.getsource(cs)
-    assert '@login_required' in src, "Expected @login_required usage"
-    assert 'def login_required' not in src, (
-        "Bug is fixed! Remove this test and update the test suite."
-    )
+    assert hasattr(cs, 'login_required'), "login_required must be defined"
+    assert callable(cs.login_required), "login_required must be callable"
 
 
 # ── Health ────────────────────────────────────────────────────────────────────
@@ -146,7 +137,7 @@ def test_bcrypt_hash_and_verify():
     h = cs._bcrypt_hash('mypassword')
     valid, needs_upgrade = cs._bcrypt_verify('mypassword', h)
     assert valid is True
-    assert needs_upgrade is False  # bcrypt hash doesn't need upgrade
+    assert needs_upgrade is False
 
 def test_bcrypt_verify_wrong_password():
     h = cs._bcrypt_hash('mypassword')
