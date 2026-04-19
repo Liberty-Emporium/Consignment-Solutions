@@ -1,0 +1,63 @@
+name: Test & Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  syntax-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python3 -c "import ast; ast.parse(open('app.py').read()); print('Syntax OK')"
+      - run: pip install flake8 -q && flake8 app.py --max-line-length=200 --ignore=E501,W503,E302,E303,W291,W293,E711,E712 || true
+
+  health-check:
+    runs-on: ubuntu-latest
+    needs: syntax-check
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Wait for Railway deploy
+        run: sleep 90
+      - name: Health check
+        run: |
+          for i in 1 2 3 4 5 6 7 8; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://web-production-43ce4.up.railway.app/health)
+            BODY=$(curl -s https://web-production-43ce4.up.railway.app/health)
+            echo "Attempt $i: HTTP $STATUS - $BODY"
+            if [ "$STATUS" = "200" ]; then echo "Healthy!"; exit 0; fi
+            sleep 15
+          done
+          echo "Failed health check"; exit 1
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    needs: health-check
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install playwright pytest requests -q && playwright install chromium --with-deps -q
+      - name: Run tests
+        run: |
+          python3 -m pytest - << 'PYEOF'
+          import requests
+          BASE = "https://web-production-43ce4.up.railway.app"
+          def test_health():
+              r = requests.get(f"{BASE}/health", timeout=15)
+              assert r.status_code == 200
+              assert r.json().get("status") == "ok"
+          def test_homepage():
+              r = requests.get(BASE, timeout=15, allow_redirects=True)
+              assert r.status_code == 200
+          def test_login():
+              r = requests.get(f"{BASE}/login", timeout=15, allow_redirects=True)
+              assert r.status_code == 200
+          PYEOF
