@@ -13,7 +13,7 @@
 </div></div></div>
 <script>
 function send(){const i=document.getElementById('inp');const m=i.value.trim();if(!m)return;add(m,'u');i.value='';document.getElementById('sb').textContent='...';document.getElementById('sb').disabled=true;
-fetch('/api/ai/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:m})})
+fetch('/api/ai/chat',{method:'POST', credentials: 'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:m})})
 .then(r=>r.json()).then(d=>{add(d.response||d.error,'a');document.getElementById('sb').textContent='Send →';document.getElementById('sb').disabled=false;})
 .catch(()=>{add('Error. Add AI key in Settings.','a');document.getElementById('sb').textContent='Send →';document.getElementById('sb').disabled=false;});}
 function qa(q){document.getElementById('inp').value=q;send();}
