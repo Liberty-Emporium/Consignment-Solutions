@@ -37,8 +37,12 @@ td{padding:0.6rem 0.8rem;border-bottom:1px solid #f1f5f9;font-size:0.85rem;}
 <td>{{ s.trial_ends or '—' }}</td>
 <td>{{ s.created_at[:10] }}</td>
 <td style="display:flex;gap:4px;">
-{% if s.status != 'active' %}<form method="POST" action="/admin/store/{{ s.id }}/activate" style="display:inline;"><button class="btn btn-s">Activate</button></form>{% endif %}
-{% if s.status != 'suspended' %}<form method="POST" action="/admin/store/{{ s.id }}/suspend" style="display:inline;"><button class="btn btn-d" onclick="return confirm('Suspend?')">Suspend</button></form>{% endif %}
+{% if s.status != 'active' %}<form method="POST" action="/admin/store/{{ s.id }}/activate" style="display:inline;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<button class="btn btn-s">Activate</button></form>{% endif %}
+{% if s.status != 'suspended' %}<form method="POST" action="/admin/store/{{ s.id }}/suspend" style="display:inline;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<button class="btn btn-d" onclick="return confirm('Suspend?')">Suspend</button></form>{% endif %}
 </td>
 </tr>{% endfor %}</tbody></table>
 </div>

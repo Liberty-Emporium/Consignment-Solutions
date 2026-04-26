@@ -8,6 +8,8 @@
 <td><strong>${{ '%.2f'|format(i.price) }}</strong></td><td>{{ i.quantity }}</td><td>{{ i.quantity_sold }}</td>
 <td style="display:flex;gap:4px;">
 <a href="/items/edit/{{ i.id }}" class="btn btn-sm btn-g">Edit</a>
-<form method="POST" action="/items/delete/{{ i.id }}" style="display:inline;"><button class="btn btn-sm btn-d" onclick="return confirm('Remove?')">Del</button></form>
+<form method="POST" action="/items/delete/{{ i.id }}" style="display:inline;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<button class="btn btn-sm btn-d" onclick="return confirm('Remove?')">Del</button></form>
 </td></tr>{% endfor %}</tbody></table>
 {% else %}<div class="empty"><div class="ei">📦</div><p>No items yet.</p></div>{% endif %}</div>{% endblock %}

@@ -18,6 +18,8 @@ input::placeholder{color:#64748b;}input:focus{outline:none;border-color:#f59e0b;
   <div class="trial-badge">🎉 14-day free trial · No credit card required · $49/month after</div>
   {% with messages = get_flashed_messages(with_categories=true) %}{% for c,m in messages %}<div class="alert">{{ m }}</div>{% endfor %}{% endwith %}
   <form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
     <label>Store Name</label><input name="store_name" placeholder="e.g. Main Street Consignment" required>
     <label>Your Email</label><input type="email" name="email" placeholder="you@email.com" required>
     <label>Phone (optional)</label><input name="phone" placeholder="555-1234">

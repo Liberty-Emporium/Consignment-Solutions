@@ -11,6 +11,8 @@
     {% endfor %}
   {% endwith %}
   <form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
     <div class="card mb-4">
       <div class="card-header d-flex align-items-center justify-content-between">
         <span style="font-weight:700;font-size:1rem;">🔑 OpenRouter API Key</span>

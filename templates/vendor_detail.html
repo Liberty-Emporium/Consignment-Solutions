@@ -17,7 +17,9 @@
 <div><strong>{{ s.shelf_number }}</strong> — {{ s.size }}<br><small>Since {{ s.start_date }}</small></div>
 <div style="text-align:right;"><strong>${{ '%.2f'|format(s.monthly_rent) }}/mo</strong><br>
 <span class="badge {% if s.status=='active' %}bg{% else %}bk{% endif %}">{{ s.status }}</span>
-{% if s.status=='active' %}<form method="POST" action="/shelves/release/{{ s.id }}" style="display:inline;margin-left:4px;"><button class="btn btn-sm btn-d" onclick="return confirm('Release?')">Release</button></form>{% endif %}
+{% if s.status=='active' %}<form method="POST" action="/shelves/release/{{ s.id }}" style="display:inline;margin-left:4px;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<button class="btn btn-sm btn-d" onclick="return confirm('Release?')">Release</button></form>{% endif %}
 </div></div>{% else %}<div class="empty"><p>No shelves assigned</p></div>{% endfor %}</div>
 <div class="card"><h3>📊 Settlement History</h3>
 <table><thead><tr><th>Month</th><th>Sales</th><th>Rent</th><th>Balance</th></tr></thead><tbody>

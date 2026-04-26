@@ -1,6 +1,8 @@
 {% extends 'base.html' %}{% block title %}Record Sale{% endblock %}{% block content %}
 <div class="ph"><h1>💲 Record a Sale</h1></div>
 <div class="card" style="max-width:500px;"><form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
 <div class="fg"><label>Vendor</label><select name="vendor_id" id="vsel" required><option value="">— Select —</option>{% for v in vendors %}<option value="{{ v.id }}">{{ v.name }}</option>{% endfor %}</select></div>
 <div class="fg"><label>Item (optional — link to inventory)</label><select name="item_id" id="isel" onchange="fill()"><option value="">— Manual entry —</option>{% for i in items %}<option value="{{ i.id }}" data-v="{{ i.vendor_id }}" data-p="{{ i.price }}" data-n="{{ i.name }}">{{ i.vendor_name }} — {{ i.name }}</option>{% endfor %}</select></div>
 <div class="fg"><label>Item Name (if not linked)</label><input name="item_name" id="iname"></div>

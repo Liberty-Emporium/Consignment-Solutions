@@ -1,6 +1,8 @@
 {% extends 'base.html' %}{% block title %}Edit Item{% endblock %}{% block content %}
 <div class="ph"><h1>✏️ Edit Item</h1></div>
 <div class="card" style="max-width:500px;"><form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
 <div class="fg"><label>Item Name</label><input name="name" value="{{ item.name }}" required></div>
 <div class="fg"><label>Description</label><textarea name="description" rows="2">{{ item.description or '' }}</textarea></div>
 <div class="g2"><div class="fg"><label>Price ($)</label><input type="number" name="price" step="0.01" value="{{ item.price }}" required></div>

@@ -1,6 +1,8 @@
 {% extends 'base.html' %}{% block title %}Assign Shelf{% endblock %}{% block content %}
 <div class="ph"><h1>🗄️ Assign Shelf to Vendor</h1></div>
 <div class="card" style="max-width:460px;"><form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
 <div class="fg"><label>Available Shelf</label><select name="shelf_id" required>{% for s in available %}<option value="{{ s.id }}">{{ s.shelf_number }} — ${{ '%.2f'|format(s.monthly_rent) }}/mo</option>{% endfor %}</select></div>
 <div class="fg"><label>Vendor</label><select name="vendor_id" required>{% for v in vendors %}<option value="{{ v.id }}">{{ v.name }}</option>{% endfor %}</select></div>
 <div class="fg"><label>Start Date</label><input type="date" name="start_date" value="{{ today }}" required></div>

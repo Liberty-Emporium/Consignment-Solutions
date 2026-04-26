@@ -13,6 +13,8 @@ input{width:100%;padding:0.72rem;border:1px solid rgba(255,255,255,0.15);border-
   <p class="sub">Consignment Solutions</p>
   {% with messages = get_flashed_messages(with_categories=true) %}{% for c,m in messages %}<div class="alert">{{ m }}</div>{% endfor %}{% endwith %}
   <form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
     <label>Email</label><input type="email" name="email" required>
     <label>Password</label><input type="password" name="password" required>
     <button class="btn">Login</button>

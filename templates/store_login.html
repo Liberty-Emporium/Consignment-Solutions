@@ -17,6 +17,8 @@ input::placeholder{color:#64748b;}input:focus{outline:none;border-color:#f59e0b;
   <p class="sub">Store Admin Login</p>
   {% with messages = get_flashed_messages(with_categories=true) %}{% for c,m in messages %}<div class="alert">{{ m }}</div>{% endfor %}{% endwith %}
   <form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
     <label>Email</label><input type="email" name="email" placeholder="store@email.com" required>
     <label>Password</label><input type="password" name="password" placeholder="Password" required>
     <button class="btn">Login →</button>
