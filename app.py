@@ -287,6 +287,17 @@ def _validate_csrf():
 app.jinja_env.globals['csrf_token'] = _get_csrf_token
 
 
+
+@app.before_request
+def _csrf_protect():
+    """Enforce CSRF on all state-changing requests."""
+    if request.method in ('POST', 'PUT', 'DELETE', 'PATCH'):
+        if request.path.startswith('/api/'):
+            return  # API routes use token auth, skip CSRF
+        if not _validate_csrf():
+            from flask import abort
+            abort(403)
+
 import time as _rl_time
 from collections import defaultdict as _defaultdict
 
