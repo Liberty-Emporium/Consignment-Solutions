@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Billing | Consignment Solutions</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Segoe UI',sans-serif;background:#f8fafc;color:#1e293b;}
+    nav{background:#1a1a2e;padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between;}
+    .logo{color:#fff;font-size:1.1rem;font-weight:800;text-decoration:none;}.logo span{color:#f59e0b;}
+    nav a{color:#94a3b8;text-decoration:none;font-size:0.9rem;}
+    .wrap{max-width:800px;margin:3rem auto;padding:0 1rem;}
+    h1{font-size:2rem;font-weight:900;margin-bottom:0.25rem;}
+    .sub{color:#64748b;margin-bottom:2rem;}
+    .current-plan{background:#f0fdf4;border-left:4px solid #22c55e;border-radius:12px;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;}
+    .current-plan .label{font-size:0.7rem;font-weight:700;text-transform:uppercase;color:#16a34a;letter-spacing:.08em;}
+    .current-plan .name{font-size:1.5rem;font-weight:900;color:#14532d;}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+    @media(max-width:600px){.grid{grid-template-columns:1fr;}}
+    .card{background:#fff;border-radius:20px;padding:2.5rem;box-shadow:0 4px 20px rgba(0,0,0,0.08);}
+    .card.dark{background:linear-gradient(135deg,#1a1a2e,#0f3460);color:#fff;}
+    .plan-badge{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#6366f1;margin-bottom:.5rem;}
+    .card.dark .plan-badge{color:#a5b4fc;}
+    .price{font-size:3rem;font-weight:900;line-height:1.1;margin:.4rem 0;}
+    .price span{font-size:1rem;font-weight:400;color:#94a3b8;}
+    .desc{font-size:0.85rem;color:#64748b;margin-bottom:1.5rem;}
+    .card.dark .desc{color:#94a3b8;}
+    ul{list-style:none;margin-bottom:2rem;}
+    ul li{padding:.45rem 0;border-bottom:1px solid #f1f5f9;font-size:.9rem;}
+    .card.dark ul li{border-color:rgba(255,255,255,.1);color:#e2e8f0;}
+    .btn{display:block;width:100%;padding:.85rem;border-radius:12px;font-size:1rem;font-weight:700;text-align:center;cursor:pointer;border:none;text-decoration:none;}
+    .btn-primary{background:#6366f1;color:#fff;}
+    .btn-light{background:#fff;color:#1a1a2e;}
+    .btn-outline{background:transparent;border:2px solid #6366f1;color:#6366f1;}
+    .btn-success{background:#22c55e;color:#fff;cursor:default;}
+    .btn-manage{background:transparent;border:1.5px solid rgba(255,255,255,.3);color:#e2e8f0;padding:.6rem 1.2rem;border-radius:10px;font-size:.85rem;font-weight:600;cursor:pointer;}
+    .badge-pop{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#1a1a2e;font-size:.7rem;font-weight:800;padding:3px 14px;border-radius:20px;}
+    .card-wrap{position:relative;}
+    .alert{padding:.75rem 1rem;border-radius:8px;margin-bottom:1.25rem;font-size:.88rem;}
+    .alert-success{background:#dcfce7;color:#166534;}
+    .alert-danger{background:#fee2e2;color:#991b1b;}
+    .limit-note{font-size:.8rem;color:#64748b;margin-top:-.75rem;margin-bottom:1.5rem;}
+  </style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="/">Consignment <span>Solutions</span></a>
+  <a href="/dashboard">← Dashboard</a>
+</nav>
+
+<div class="wrap">
+  <h1>Billing & Subscription</h1>
+  <p class="sub">Manage your plan and payment details.</p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="alert alert-{{ 'danger' if cat=='error' else 'success' }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <!-- Current Plan -->
+  <div class="current-plan">
+    <div>
+      <div class="label">Current Plan</div>
+      <div class="name">
+        {% if plan == 'pro' %}Pro — $59/mo
+        {% elif plan == 'basic' %}Basic — $29/mo
+        {% elif plan == 'trial' %}Free Trial
+        {% else %}Expired
+        {% endif %}
+      </div>
+      <div style="font-size:.85rem;color:#64748b;margin-top:.25rem;">
+        {{ vendor_count }} vendor{{ 's' if vendor_count != 1 }} active
+        {% if plan == 'basic' %} · limit: 15{% elif plan == 'pro' %} · unlimited{% endif %}
+      </div>
+    </div>
+    {% if plan in ('basic','pro') %}
+    <form method="POST" action="/billing/portal">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn btn-outline" style="width:auto;padding:.6rem 1.2rem;font-size:.85rem;">Manage / Cancel</button>
+    </form>
+    {% endif %}
+  </div>
+
+  <!-- Plan Cards -->
+  <div class="grid">
+    <!-- Basic -->
+    <div class="card-wrap">
+      <div class="card">
+        <div class="plan-badge">BASIC</div>
+        <div class="price">$29<span>/mo</span></div>
+        <p class="desc">Great for single-location consignment stores</p>
+        <ul>
+          <li>✅ Up to 15 vendor slots</li>
+          <li>✅ Vendor portal logins</li>
+          <li>✅ Item tracking & sales</li>
+          <li>✅ Monthly settlements</li>
+          <li>✅ Square POS integration</li>
+        </ul>
+        {% if plan == 'basic' %}
+          <span class="btn btn-success">✓ Current Plan</span>
+        {% elif stripe_configured %}
+          <a href="/billing/checkout/basic" class="btn btn-primary">Get Basic →</a>
+        {% else %}
+          <span class="btn btn-outline" style="cursor:default;opacity:.6;">Stripe not configured</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Pro -->
+    <div class="card-wrap">
+      <span class="badge-pop">BEST VALUE</span>
+      <div class="card dark">
+        <div class="plan-badge">PRO</div>
+        <div class="price">$59<span>/mo</span></div>
+        <p class="desc">For stores with large vendor networks</p>
+        <ul>
+          <li>✅ Everything in Basic</li>
+          <li>✅ Unlimited vendor slots</li>
+          <li>✅ Advanced reporting</li>
+          <li>✅ AI assistant (full access)</li>
+          <li>✅ Priority support</li>
+        </ul>
+        {% if plan == 'pro' %}
+          <span class="btn btn-success">✓ Current Plan</span>
+        {% elif stripe_configured %}
+          <a href="/billing/checkout/pro" class="btn btn-light">Get Pro →</a>
+        {% else %}
+          <span class="btn btn-manage" style="cursor:default;">Stripe not configured</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <p style="text-align:center;color:#94a3b8;font-size:.8rem;margin-top:1.5rem;">
+    Payments securely processed by Stripe · Cancel anytime
+  </p>
+</div>
+</body>
+</html>

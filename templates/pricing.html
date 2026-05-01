@@ -1,31 +1,89 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pricing | Consignment Solutions</title>
-<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Segoe UI',sans-serif;background:#f8fafc;}
-nav{background:#1a1a2e;padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between;}
-.logo{color:#fff;font-size:1.1rem;font-weight:800;text-decoration:none;}.logo span{color:#f59e0b;}
-.section{max-width:500px;margin:4rem auto;padding:0 1rem;text-align:center;}
-h1{font-size:2rem;font-weight:800;margin-bottom:0.5rem;}
-.sub{color:#64748b;margin-bottom:2.5rem;}
-.card{background:#fff;border-radius:16px;padding:2.5rem;box-shadow:0 4px 20px rgba(0,0,0,0.08);border:2px solid #f59e0b;}
-.amount{font-size:3rem;font-weight:900;}.amount span{font-size:1rem;color:#64748b;font-weight:400;}
-.desc{color:#64748b;margin:0.5rem 0 1.5rem;}
-ul{list-style:none;text-align:left;margin-bottom:2rem;}
-ul li{padding:0.5rem 0;border-bottom:1px solid #f1f5f9;font-size:0.9rem;}ul li::before{content:"✅ ";}
-.btn{display:block;width:100%;padding:1rem;background:#f59e0b;color:#1a1a2e;border:none;border-radius:10px;font-size:1rem;font-weight:800;text-decoration:none;text-align:center;cursor:pointer;}
-</style></head><body>
-<nav><a class="logo" href="/">Consignment <span>Solutions</span></a><a href="/store/login" style="color:#94a3b8;text-decoration:none;font-size:0.9rem;">Log In</a></nav>
-<div class="section">
-  <h1>Simple Pricing</h1>
-  <p class="sub">Your trial has ended. Subscribe to keep your store running.</p>
-  <div class="card">
-    <div class="amount">$49<span>/month</span></div>
-    <p class="desc">All features included · Cancel anytime</p>
-    <ul>
-      <li>Unlimited vendors & shelves</li><li>Square POS integration</li>
-      <li>Vendor portal logins</li><li>Auto monthly settlements</li>
-      <li>AI assistant</li>
-    </ul>
-    <a href="/signup" class="btn">Subscribe Now →</a>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pricing | Consignment Solutions</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Segoe UI',sans-serif;background:#f8fafc;color:#1e293b;}
+    nav{background:#1a1a2e;padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between;}
+    .logo{color:#fff;font-size:1.1rem;font-weight:800;text-decoration:none;}.logo span{color:#f59e0b;}
+    nav a{color:#94a3b8;text-decoration:none;font-size:.9rem;}
+    .wrap{max-width:820px;margin:4rem auto;padding:0 1rem;text-align:center;}
+    h1{font-size:2.5rem;font-weight:900;margin-bottom:.5rem;}
+    .sub{color:#64748b;font-size:1.1rem;margin-bottom:.4rem;}
+    .trial-note{color:#94a3b8;font-size:.85rem;margin-bottom:3rem;}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;text-align:left;}
+    @media(max-width:600px){.grid{grid-template-columns:1fr;}}
+    .card{background:#fff;border-radius:20px;padding:2.5rem;box-shadow:0 4px 20px rgba(0,0,0,0.08);}
+    .card.dark{background:linear-gradient(135deg,#1a1a2e,#0f3460);color:#fff;}
+    .card-wrap{position:relative;}
+    .plan-badge{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#6366f1;margin-bottom:.5rem;}
+    .card.dark .plan-badge{color:#a5b4fc;}
+    .price{font-size:3.2rem;font-weight:900;line-height:1.1;margin:.4rem 0;}
+    .price span{font-size:1rem;font-weight:400;color:#94a3b8;}
+    .desc{font-size:.85rem;color:#64748b;margin-bottom:1.5rem;}
+    .card.dark .desc{color:#94a3b8;}
+    ul{list-style:none;margin-bottom:2rem;}
+    ul li{padding:.45rem 0;border-bottom:1px solid #f1f5f9;font-size:.9rem;}
+    .card.dark ul li{border-color:rgba(255,255,255,.1);color:#e2e8f0;}
+    .btn{display:block;width:100%;padding:.85rem;border-radius:12px;font-size:1rem;font-weight:700;text-align:center;text-decoration:none;}
+    .btn-outline{border:2px solid #6366f1;color:#6366f1;background:transparent;}
+    .btn-light{background:#fff;color:#1a1a2e;}
+    .badge-pop{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#1a1a2e;font-size:.7rem;font-weight:800;padding:3px 14px;border-radius:20px;}
+    .footnote{color:#94a3b8;font-size:.8rem;margin-top:2rem;}
+  </style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="/">Consignment <span>Solutions</span></a>
+  <a href="/store/login">Log In</a>
+</nav>
+
+<div class="wrap">
+  <h1>Simple, Transparent Pricing</h1>
+  <p class="sub">Everything you need to run a modern consignment store.</p>
+  <p class="trial-note">14-day free trial &middot; No credit card required &middot; Cancel anytime</p>
+
+  <div class="grid">
+    <!-- Basic -->
+    <div class="card-wrap">
+      <div class="card">
+        <div class="plan-badge">BASIC</div>
+        <div class="price">$29<span>/mo</span></div>
+        <p class="desc">Great for single-location stores</p>
+        <ul>
+          <li>✅ Up to 15 vendor slots</li>
+          <li>✅ Vendor portal logins</li>
+          <li>✅ Item tracking & sales</li>
+          <li>✅ Monthly settlements</li>
+          <li>✅ Square POS integration</li>
+        </ul>
+        <a href="/signup" class="btn btn-outline">Start Free Trial →</a>
+      </div>
+    </div>
+
+    <!-- Pro -->
+    <div class="card-wrap">
+      <span class="badge-pop">MOST POPULAR</span>
+      <div class="card dark">
+        <div class="plan-badge">PRO</div>
+        <div class="price">$59<span>/mo</span></div>
+        <p class="desc">For stores with large vendor networks</p>
+        <ul>
+          <li>✅ Everything in Basic</li>
+          <li>✅ Unlimited vendor slots</li>
+          <li>✅ Advanced reporting</li>
+          <li>✅ AI assistant (full access)</li>
+          <li>✅ Priority support</li>
+        </ul>
+        <a href="/signup" class="btn btn-light">Start Free Trial →</a>
+      </div>
+    </div>
   </div>
+
+  <p class="footnote">All plans include a 14-day free trial. Subscribe from your dashboard after trial to keep access.</p>
 </div>
-</body></html>
+</body>
+</html>

@@ -583,6 +583,19 @@ def init_db():
 
 init_db()
 
+# ── Stripe column migrations (safe: ignore if already exist) ──────────────────
+def _run_stripe_migrations():
+    db = sqlite3.connect(DB_FILE)
+    for col, typedef in [('stripe_customer_id', 'TEXT DEFAULT ""'),
+                         ('stripe_subscription_id', 'TEXT DEFAULT ""')]:
+        try:
+            db.execute(f'ALTER TABLE stores ADD COLUMN {col} {typedef}')
+            db.commit()
+        except Exception:
+            pass
+    db.close()
+_run_stripe_migrations()
+
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
 def hash_pw(pw): return _bcrypt_hash(pw)
@@ -1588,3 +1601,124 @@ def reset_password(token):
         flash('Password updated! You can now sign in.', 'success')
         return redirect(url_for('store_login'))
     return render_template('reset_password.html', token=token, email=reset.get('email',''))
+
+# ══════════════════════════════════════════════════════════════════════════════
+# STRIPE BILLING — Added 2026-05-01
+# Plans: Basic $29/mo (≤15 vendor slots) · Pro $59/mo (unlimited)
+# ══════════════════════════════════════════════════════════════════════════════
+import stripe as _stripe
+import threading as _stripe_thread
+
+_stripe.api_key         = os.environ.get('STRIPE_SECRET_KEY', '')
+STRIPE_PK               = os.environ.get('STRIPE_PUBLISHABLE_KEY', '')
+STRIPE_WH_SECRET        = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
+STRIPE_PRICE_BASIC      = os.environ.get('STRIPE_PRICE_BASIC',     'price_1TSLMWE50C70iVkQDqv1U0HG')
+STRIPE_PRICE_PRO_PLAN   = os.environ.get('STRIPE_PRICE_PRO_PLAN',  'price_1TSLMWE50C70iVkQaBapuiqN')
+
+CONSIGN_PLAN_LIMITS = {
+    'basic': {'vendor_slots': 15,  'label': 'Basic', 'price': '$29/mo'},
+    'pro':   {'vendor_slots': 9999,'label': 'Pro',   'price': '$59/mo'},
+}
+
+@app.route('/billing')
+@store_login_required
+def billing():
+    db   = get_db()
+    store = db.execute('SELECT * FROM stores WHERE id=?', (session['store_id'],)).fetchone()
+    plan  = store['plan'] if store else 'trial'
+    vendor_count = db.execute('SELECT COUNT(*) FROM vendors WHERE store_id=?', (session['store_id'],)).fetchone()[0]
+    return render_template('billing.html',
+        plan=plan,
+        stripe_pk=STRIPE_PK,
+        plan_limits=CONSIGN_PLAN_LIMITS,
+        vendor_count=vendor_count,
+        stripe_configured=bool(_stripe.api_key))
+
+@app.route('/billing/checkout/<plan_name>')
+@store_login_required
+def billing_checkout(plan_name):
+    if plan_name not in ('basic', 'pro'):
+        flash('Invalid plan.', 'error')
+        return redirect(url_for('billing'))
+    if not _stripe.api_key:
+        flash('Stripe is not configured.', 'error')
+        return redirect(url_for('billing'))
+    db    = get_db()
+    store = db.execute('SELECT * FROM stores WHERE id=?', (session['store_id'],)).fetchone()
+    email = store['email'] if store else ''
+    price_id = STRIPE_PRICE_BASIC if plan_name == 'basic' else STRIPE_PRICE_PRO_PLAN
+    base_url  = request.host_url.rstrip('/')
+    try:
+        checkout = _stripe.checkout.Session.create(
+            customer_email=email,
+            payment_method_types=['card'],
+            line_items=[{'price': price_id, 'quantity': 1}],
+            mode='subscription',
+            metadata={'store_id': str(session['store_id']), 'plan': plan_name},
+            success_url=base_url + '/billing/success?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url=base_url + '/billing',
+        )
+        return redirect(checkout.url)
+    except Exception as e:
+        app.logger.error(f'Stripe checkout error: {e}')
+        flash('Could not start checkout. Please try again.', 'error')
+        return redirect(url_for('billing'))
+
+@app.route('/billing/success')
+@store_login_required
+def billing_success():
+    flash('🎉 Subscription active! Your store is fully unlocked.', 'success')
+    return redirect(url_for('dashboard'))
+
+@app.route('/billing/portal', methods=['POST'])
+@store_login_required
+def billing_portal():
+    db    = get_db()
+    store = db.execute('SELECT * FROM stores WHERE id=?', (session['store_id'],)).fetchone()
+    cust_id = store['stripe_customer_id'] if store else None
+    if not cust_id:
+        flash('No billing account found.', 'error')
+        return redirect(url_for('billing'))
+    try:
+        portal = _stripe.billing_portal.Session.create(
+            customer=cust_id,
+            return_url=request.host_url.rstrip('/') + '/billing',
+        )
+        return redirect(portal.url)
+    except Exception as e:
+        app.logger.error(f'Stripe portal error: {e}')
+        flash('Could not open billing portal.', 'error')
+        return redirect(url_for('billing'))
+
+@app.route('/webhook/stripe', methods=['POST'])
+def consignment_stripe_webhook():
+    payload = request.get_data()
+    sig     = request.headers.get('Stripe-Signature', '')
+    try:
+        if STRIPE_WH_SECRET:
+            event = _stripe.Webhook.construct_event(payload, sig, STRIPE_WH_SECRET)
+        else:
+            event = _stripe.Event.construct_from(json.loads(payload), _stripe.api_key)
+    except Exception:
+        return '', 400
+    _stripe_thread.Thread(target=_handle_consignment_stripe_event, args=(event,), daemon=True).start()
+    return '', 200
+
+def _handle_consignment_stripe_event(event):
+    etype = event['type']
+    obj   = event['data']['object']
+    db    = get_db()
+    if etype == 'checkout.session.completed':
+        store_id = obj.get('metadata', {}).get('store_id')
+        plan     = obj.get('metadata', {}).get('plan', 'basic')
+        cust_id  = obj.get('customer')
+        sub_id   = obj.get('subscription')
+        if store_id:
+            db.execute('UPDATE stores SET plan=?, stripe_customer_id=?, stripe_subscription_id=? WHERE id=?',
+                       (plan, cust_id, sub_id, int(store_id)))
+            db.commit()
+            app.logger.info(f'Consignment plan activated: store_id={store_id} plan={plan}')
+    elif etype == 'customer.subscription.deleted':
+        cust_id = obj.get('customer')
+        db.execute("UPDATE stores SET plan='trial', stripe_subscription_id=NULL WHERE stripe_customer_id=?", (cust_id,))
+        db.commit()
