@@ -1,4 +1,24 @@
-{% extends 'base.html' %}{% block title %}Items{% endblock %}{% block content %}
+{% extends 'base.html' %}{% block title %}Items{% endblock %}{% block help_content %}
+<h3>What is this page?</h3>
+<p>Items is your complete inventory — everything currently in the store, who it belongs to, what it's priced at, and where it's located.</p>
+<h3>Adding an Item</h3>
+<ul>
+  <li>Click <strong>+ Add Item</strong> (or <strong>Vendor Add Item</strong> if the vendor is logging their own)</li>
+  <li>Fill in: name, description, asking price, vendor, shelf location, category</li>
+  <li>Add a photo — items with photos sell faster</li>
+  <li>Set status to <strong>Active</strong> to make it visible and for-sale</li>
+</ul>
+<h3>Item Statuses</h3>
+<ul>
+  <li><strong>Active</strong> — on the floor, available for sale</li>
+  <li><strong>Sold</strong> — sold, pending vendor settlement</li>
+  <li><strong>Returned</strong> — given back to vendor, no longer in store</li>
+  <li><strong>Donated</strong> — not sold, donated to charity</li>
+</ul>
+<div class="help-tip">Reduce item prices after 30 days unsold — slow-moving inventory ties up your shelves. Use the AI Assistant to help price items competitively.</div>
+{% endblock %}
+{% block content %}
+{% block content %}
 <div class="ph"><div><h1>📦 Items on Floor</h1></div><a href="/items/add" class="btn btn-p">+ Add Item</a></div>
 <div class="card">{% if items %}
 <table><thead><tr><th>Item</th><th>Vendor</th><th>Shelf</th><th>Price</th><th>Qty</th><th>Sold</th><th></th></tr></thead><tbody>

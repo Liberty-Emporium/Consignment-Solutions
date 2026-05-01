@@ -57,6 +57,28 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#f59e0b;box-sh
 .pos{color:#16a34a;font-weight:700;}.neg{color:#dc2626;font-weight:700;}
 .trial-bar{background:#fffbeb;border-bottom:1px solid #fde68a;padding:0.5rem 1.5rem;font-size:0.82rem;color:#92400e;text-align:center;}
 @media(max-width:768px){.g2,.g3{grid-template-columns:1fr;}.nav-links a span{display:none;}}
+
+    /* ── Help Drawer ─────────────────────────────────────────────── */
+    .help-fab{position:fixed;bottom:24px;right:24px;z-index:500;display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:30px;font-size:.84rem;font-weight:700;cursor:pointer;border:none;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 4px 20px rgba(99,102,241,.45);transition:all .2s;font-family:inherit}
+    .help-fab:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(99,102,241,.6)}
+    .help-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;backdrop-filter:blur(2px)}
+    .help-overlay.open{display:block}
+    .help-drawer{position:fixed;top:0;right:-440px;bottom:0;width:420px;max-width:100vw;background:#111827;border-left:1px solid rgba(255,255,255,.1);z-index:700;display:flex;flex-direction:column;transition:right .28s ease;overflow:hidden;font-family:inherit}
+    .help-drawer.open{right:0}
+    .help-drawer-hdr{padding:18px 22px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#0d1117}
+    .help-drawer-title{font-size:1rem;font-weight:700;color:#a78bfa}
+    .help-close{background:none;border:none;color:#6b7280;font-size:1.3rem;cursor:pointer;padding:2px 7px;border-radius:6px;transition:color .15s}
+    .help-close:hover{color:#ef4444}
+    .help-body{padding:20px 22px;overflow-y:auto;flex:1;line-height:1.6}
+    .help-body h3{font-size:.9rem;font-weight:700;color:#a78bfa;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.06)}
+    .help-body h3:first-child{margin-top:0}
+    .help-body p{font-size:.83rem;color:#9ca3af;margin-bottom:9px}
+    .help-body ul{padding-left:16px;margin-bottom:10px}
+    .help-body ul li{font-size:.82rem;color:#9ca3af;line-height:1.7}
+    .help-body ul li strong{color:#e5e7eb}
+    .help-tip{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:10px 13px;font-size:.8rem;color:#fbbf24;line-height:1.55;margin-top:14px}
+    .help-tip::before{content:'💡 Tip: ';font-weight:700}
+    /* ────────────────────────────────────────────────────────────── */
 </style>
     <meta property="og:image" content="https://web-production-43ce4.up.railway.app/static/preview.png">
     <meta name="twitter:image" content="https://web-production-43ce4.up.railway.app/static/preview.png">
@@ -281,6 +303,23 @@ document.addEventListener('DOMContentLoaded',function(){
 })();
 </script>
 <!-- ── end i18n ── -->
+
+
+<div class="help-overlay" id="helpOverlay" onclick="closeHelp()"></div>
+<div class="help-drawer" id="helpDrawer">
+  <div class="help-drawer-hdr">
+    <div class="help-drawer-title">❓ Page Help</div>
+    <button class="help-close" onclick="closeHelp()">✕</button>
+  </div>
+  <div class="help-body" id="helpBody">
+    {% block help_content %}<p>Help content for this page coming soon.</p>{% endblock %}
+  </div>
+</div>
+<button class="help-fab" onclick="openHelp()">❓ Help</button>
+<script>
+function openHelp(){document.getElementById('helpDrawer').classList.add('open');document.getElementById('helpOverlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeHelp(){document.getElementById('helpDrawer').classList.remove('open');document.getElementById('helpOverlay').classList.remove('open');document.body.style.overflow='';}
+</script>
 
 </body>
 </html>

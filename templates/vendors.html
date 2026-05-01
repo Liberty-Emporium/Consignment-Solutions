@@ -1,4 +1,22 @@
-{% extends 'base.html' %}{% block title %}Vendors{% endblock %}{% block content %}
+{% extends 'base.html' %}{% block title %}Vendors{% endblock %}{% block help_content %}
+<h3>What is this page?</h3>
+<p>Vendors are the people or businesses whose items you sell on consignment. Every item in your store belongs to a vendor, and every sale owes a vendor their cut.</p>
+<h3>Adding a Vendor</h3>
+<ul>
+  <li>Click <strong>+ Add Vendor</strong> and fill in: name, email, phone, commission rate</li>
+  <li>Set their <strong>commission split</strong> — e.g., 60% to vendor, 40% to store</li>
+  <li>Each vendor gets login access to check their own items and balance</li>
+</ul>
+<h3>Vendor Portal</h3>
+<ul>
+  <li>Vendors can log in at <em>/vendor/login</em> to see their items, sales, and pending settlements</li>
+  <li>This eliminates the constant "what sold?" calls from vendors</li>
+  <li>Send new vendors their login credentials right when you add them</li>
+</ul>
+<div class="help-tip">Set commission rates clearly when onboarding a vendor — disputes about splits are the #1 source of vendor friction in consignment stores.</div>
+{% endblock %}
+{% block content %}
+{% block content %}
 <div class="ph"><div><h1>👥 Vendors</h1><p>{{ month }}</p></div><a href="/vendors/add" class="btn btn-p">+ Add Vendor</a></div>
 <div class="card">{% if vendors %}
 <table><thead><tr><th>Name</th><th>Email / Phone</th><th>Shelves</th><th>Sales {{ month }}</th><th>Balance</th><th></th></tr></thead><tbody>

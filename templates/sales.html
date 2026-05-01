@@ -1,4 +1,25 @@
-{% extends 'base.html' %}{% block title %}Sales{% endblock %}{% block content %}
+{% extends 'base.html' %}{% block title %}Sales{% endblock %}{% block help_content %}
+<h3>What is this page?</h3>
+<p>Sales is the record of everything your store has sold. Every sale here triggers a vendor payout calculation and updates your revenue reports.</p>
+<h3>Recording a Sale</h3>
+<ul>
+  <li>Click <strong>+ Add Sale</strong> right when an item sells</li>
+  <li>Select the item from inventory — it auto-fills the vendor and price</li>
+  <li>Enter the actual sale price (may differ from asking price if discounted)</li>
+  <li>Select payment method: cash, card, etc.</li>
+  <li>Submit — the item status changes to Sold automatically</li>
+</ul>
+<h3>What Happens After a Sale</h3>
+<ul>
+  <li>The vendor's unsettled balance increases by their commission %</li>
+  <li>Your store revenue increases by your cut</li>
+  <li>The item disappears from Active inventory</li>
+  <li>It shows on the vendor's portal so they can see it sold</li>
+</ul>
+<div class="help-tip">Never batch sales at end of day — record each one as it happens. It keeps vendors happy and your books accurate.</div>
+{% endblock %}
+{% block content %}
+{% block content %}
 <div class="ph"><div><h1>💲 Sales</h1><p>Total: <strong>${{ '%.2f'|format(total) }}</strong></p></div>
 <div style="display:flex;gap:0.5rem;align-items:center;">
 <form method="GET" style="display:flex;gap:0.5rem;"><input type="month" name="month" value="{{ month }}" style="width:auto;"><button class="btn btn-g btn-sm">Filter</button></form>

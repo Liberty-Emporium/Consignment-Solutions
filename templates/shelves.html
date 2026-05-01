@@ -1,4 +1,22 @@
-{% extends 'base.html' %}{% block title %}Shelves{% endblock %}{% block content %}
+{% extends 'base.html' %}{% block title %}Shelves{% endblock %}{% block help_content %}
+<h3>What is this page?</h3>
+<p>Shelves are the physical storage/display locations in your store. Every item is assigned to a shelf so you and your staff can find anything instantly.</p>
+<h3>Setting Up Shelves</h3>
+<ul>
+  <li>Create one shelf per physical area: "Front Wall A", "Rack 3", "Glass Case", "Back Room B"</li>
+  <li>You can set a maximum capacity per shelf to track how full each area is</li>
+  <li>Shelves can be assigned to specific vendors (rented shelves) or shared</li>
+</ul>
+<h3>Why This Matters</h3>
+<ul>
+  <li>When a customer asks "where is the blue lamp?", you check the item record and it tells you the shelf</li>
+  <li>Shelf assignments help staff restock and tidy specific areas without confusion</li>
+  <li>Rented shelves charge vendors a monthly fee — track it here</li>
+</ul>
+<div class="help-tip">Label your physical shelves with the same names you use in the app. Consistency prevents "we can't find the item" problems.</div>
+{% endblock %}
+{% block content %}
+{% block content %}
 <div class="ph"><div><h1>🗄️ Shelves</h1></div>
 <div style="display:flex;gap:0.5rem;"><a href="/shelves/add" class="btn btn-g">+ New Shelf</a><a href="/shelves/assign" class="btn btn-p">Assign to Vendor</a></div></div>
 <div class="card"><table><thead><tr><th>Shelf #</th><th>Size</th><th>Rent/mo</th><th>Status</th><th>Vendor</th><th></th></tr></thead><tbody>

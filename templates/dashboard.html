@@ -1,4 +1,23 @@
-{% extends 'base.html' %}{% block title %}Dashboard | {{ session.store_name }}{% endblock %}{% block content %}
+{% extends 'base.html' %}{% block title %}Dashboard | {{ session.store_name }}{% endblock %}{% block help_content %}
+<h3>What is this page?</h3>
+<p>The Store Dashboard is your daily overview — pending items, recent sales, outstanding vendor settlements, and store performance at a glance.</p>
+<h3>Daily Store Workflow</h3>
+<ul>
+  <li><strong>Morning</strong> — check the dashboard for any items that sold overnight and settlements due</li>
+  <li><strong>New item drop-off?</strong> — go to Items → Add Item, assign to vendor and shelf</li>
+  <li><strong>Item sells?</strong> — record the sale in Sales → Add Sale immediately</li>
+  <li><strong>Pay period end?</strong> — run Settlements to calculate what you owe each vendor</li>
+</ul>
+<h3>Key Numbers to Watch</h3>
+<ul>
+  <li><strong>Items on floor</strong> — everything currently for sale</li>
+  <li><strong>Sales today/this week</strong> — your revenue velocity</li>
+  <li><strong>Unsettled balance</strong> — what you owe vendors but haven't paid yet</li>
+</ul>
+<div class="help-tip">Record every sale the day it happens — end-of-week batch entry leads to mistakes and vendor disputes.</div>
+{% endblock %}
+{% block content %}
+{% block content %}
 {% if store.status == 'trial' %}
 <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:0.8rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:#92400e;">
   ⏳ <strong>Free trial</strong> — expires {{ store.trial_ends }}. <a href="/pricing" style="color:#d97706;font-weight:700;">Subscribe to keep access →</a>

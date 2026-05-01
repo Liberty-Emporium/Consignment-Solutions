@@ -1,4 +1,23 @@
-{% extends 'base.html' %}{% block title %}Settlements{% endblock %}{% block content %}
+{% extends 'base.html' %}{% block title %}Settlements{% endblock %}{% block help_content %}
+<h3>What is this page?</h3>
+<p>Settlements is how you pay your vendors. It calculates exactly what each vendor is owed based on their sales since the last payment, then records when you've paid them.</p>
+<h3>Running a Settlement</h3>
+<ul>
+  <li>Select a vendor and click <strong>Generate Settlement</strong></li>
+  <li>Review the itemized list — every sale included with amounts</li>
+  <li>Deduct any shelf rent or fees if applicable</li>
+  <li>Click <strong>Mark Paid</strong> when you've handed over the money or sent a transfer</li>
+</ul>
+<h3>Settlement Schedule</h3>
+<ul>
+  <li>Most consignment stores settle monthly or bi-weekly — be consistent</li>
+  <li>Set a clear pay day with each vendor when they sign up</li>
+  <li>The <strong>Unsettled Balance</strong> on the dashboard tells you total outstanding at all times</li>
+</ul>
+<div class="help-tip">Email vendors their settlement statement when you pay — it builds trust and eliminates disputes. The app generates a printable summary you can attach.</div>
+{% endblock %}
+{% block content %}
+{% block content %}
 <div class="ph"><div><h1>📊 Settlements — {{ month }}</h1></div>
 <div style="display:flex;gap:0.5rem;align-items:center;">
 <form method="GET" style="display:flex;gap:0.5rem;"><input type="month" name="month" value="{{ month }}" style="width:auto;"><button class="btn btn-g btn-sm">Filter</button></form>

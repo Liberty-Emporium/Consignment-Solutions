@@ -1,4 +1,23 @@
-{% extends 'base.html' %}{% block title %}My Dashboard{% endblock %}{% block content %}
+{% extends 'base.html' %}{% block title %}My Dashboard{% endblock %}{% block help_content %}
+<h3>What is this page?</h3>
+<p>This is the vendor's personal view — they log in here to see their own items, what's sold, and what payout is pending. They cannot see any other vendor's data.</p>
+<h3>What Vendors Can See</h3>
+<ul>
+  <li><strong>Their items</strong> — active items currently on the floor with price and shelf location</li>
+  <li><strong>Recent sales</strong> — everything that sold and when</li>
+  <li><strong>Pending payout</strong> — their current unsettled balance</li>
+  <li><strong>Past settlements</strong> — history of previous payments</li>
+</ul>
+<h3>For Store Owners</h3>
+<ul>
+  <li>When onboarding a new vendor, send them to <em>/vendor/login</em> with their credentials</li>
+  <li>The vendor portal eliminates "what sold?" check-in calls completely</li>
+  <li>Vendors who can see their own data are more engaged and bring in better items</li>
+</ul>
+<div class="help-tip">Encourage every vendor to check their portal weekly — it makes the relationship transparent and professional.</div>
+{% endblock %}
+{% block content %}
+{% block content %}
 <div class="ph"><div><h1>👋 {{ session.vendor_name }}</h1><p>{{ session.store_name }} · {{ month }}</p></div></div>
 <div class="sg">
   <div class="stat" style="border-color:#10b981"><div class="sv">${{ '%.2f'|format(settlement.total_sales) }}</div><div class="sl">💲 My Sales</div></div>
